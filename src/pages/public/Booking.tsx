@@ -3,7 +3,7 @@ import { useLocation, Link } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { Service, BusinessHours, BlockedDate, BusinessSettings, Appointment } from "../../types";
 import { format, addMinutes, parse, startOfDay, endOfDay, isSameDay, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, addMonths, subMonths, isBefore, isSameMonth } from "date-fns";
-import { CheckCircle2, ChevronRight, ChevronLeft, ArrowLeft, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronRight, ChevronLeft, ArrowLeft, ArrowRight, Clock, XCircle } from "lucide-react";
 
 export default function Booking() {
   const location = useLocation();
@@ -38,35 +38,69 @@ export default function Booking() {
   }, [currentMonth]);
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchBookingData() {
-      const [
-        { data: servicesData },
-        { data: hoursData },
-        { data: blockedData },
-        { data: settingsData },
-        { data: appointmentsData }
-      ] = await Promise.all([
-        supabase.from("services").select("*").eq("is_active", true).order("created_at", { ascending: true }),
-        supabase.from("business_hours").select("*"),
-        supabase.from("blocked_dates").select("*").gte("blocked_date", new Date().toISOString().split('T')[0]),
-        supabase.from("business_settings").select("*").maybeSingle(),
-        supabase.from("appointments").select("*").gte("appointment_date", new Date().toISOString().split('T')[0]).neq("status", "cancelled")
-      ]);
+      try {
+        const [
+          { data: servicesData },
+          { data: hoursData },
+          { data: blockedData },
+          { data: settingsData },
+          { data: appointmentsData }
+        ] = await Promise.all([
+          supabase.from("services").select("*").eq("is_active", true).order("created_at", { ascending: true }),
+          supabase.from("business_hours").select("*"),
+          supabase.from("blocked_dates").select("*").gte("blocked_date", new Date().toISOString().split('T')[0]),
+          supabase.from("business_settings").select("*").maybeSingle(),
+          supabase.from("appointments").select("*").gte("appointment_date", new Date().toISOString().split('T')[0]).neq("status", "cancelled")
+        ]);
 
-      if (servicesData) setServices(servicesData);
-      if (hoursData) setBusinessHours(hoursData);
-      if (blockedData) setBlockedDates(blockedData);
-      if (settingsData) setSettings(settingsData);
-      if (appointmentsData) setExistingAppointments(appointmentsData);
+        if (isMounted) {
+          if (servicesData) {
+            const parsedData = servicesData.map(service => {
+              let desc = service.description || "";
+              let imgUrl = undefined;
+              if (desc.includes("|||IMAGE_URL|||")) {
+                 const parts = desc.split("|||IMAGE_URL|||");
+                 desc = parts[0];
+                 imgUrl = parts[1];
+              }
+              return { ...service, description: desc, image_url: imgUrl };
+            });
+            setServices(parsedData);
+          }
+          if (hoursData) setBusinessHours(hoursData);
+          if (blockedData) setBlockedDates(blockedData);
+          if (settingsData) setSettings(settingsData);
+          if (appointmentsData) setExistingAppointments(appointmentsData);
 
-      if (initServiceId && servicesData) {
-        const serv = servicesData.find(s => s.id === initServiceId);
-        if (serv) setSelectedService(serv);
+          if (initServiceId && servicesData) {
+            const parsedData = servicesData.map((service: any) => {
+              let desc = service.description || "";
+              let imgUrl = undefined;
+              if (desc.includes("|||IMAGE_URL|||")) {
+                 const parts = desc.split("|||IMAGE_URL|||");
+                 desc = parts[0];
+                 imgUrl = parts[1];
+              }
+              return { ...service, description: desc, image_url: imgUrl };
+            });
+            const serv = parsedData.find((s: any) => s.id === initServiceId);
+            if (serv) setSelectedService(serv);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch booking data:", err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-
-      setLoading(false);
     }
     fetchBookingData();
+    return () => {
+      isMounted = false;
+    };
   }, [initServiceId]);
 
   // Generate available slots for the selected date
@@ -204,164 +238,192 @@ export default function Booking() {
   }
 
   return (
-    <div className="bg-brand-100 min-h-screen pb-24">
-      <div className="max-w-4xl mx-auto px-6 pt-12 md:pt-20">
+    <div className="bg-brand-50 min-h-screen pb-24 font-sans selection:bg-brand-300">
+      <div className="max-w-6xl mx-auto px-6 pt-12 md:pt-24">
         
         {step < 4 && (
-          <div className="mb-12">
-            <h1 className="font-serif text-4xl text-brand-900 mb-6 tracking-tight">Reserve your session</h1>
+          <div className="mb-20 text-center flex flex-col items-center">
+            <span className="text-[11px] tracking-[0.4em] uppercase font-bold text-brand-800/40 mb-6 block">Reserve</span>
+            <h1 className="font-serif text-5xl md:text-6xl text-brand-900 mb-8 font-light leading-tight">Book your appointment</h1>
+            <p className="max-w-xl text-brand-800/60 leading-relaxed font-light mb-16">
+              Choose a service, a date and time that suits you, and we'll confirm within a few hours.
+            </p>
             
-            <div className="flex items-center gap-2 md:gap-4 text-xs font-medium uppercase tracking-widest text-slate-400">
-              <span className={step >= 1 ? 'text-brand-900' : ''}>Service</span>
-              <ChevronRight className="w-4 h-4" />
-              <span className={step >= 2 ? 'text-brand-900' : ''}>Time</span>
-              <ChevronRight className="w-4 h-4" />
-              <span className={step >= 3 ? 'text-brand-900' : ''}>Details</span>
+            <div className="flex items-center justify-center gap-4 sm:gap-12 md:gap-24 w-full overflow-x-auto pb-4 px-4 sm:px-0 sm:overflow-visible">
+              {[
+                { n: 1, label: 'Service' },
+                { n: 2, label: 'Date & Time' },
+                { n: 3, label: 'Your Details' },
+                { n: 4, label: 'Confirmed' }
+              ].map((s, i) => (
+                <div key={s.n} className="flex flex-col items-center gap-4 relative min-w-[80px]">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ring-4 ring-white shadow-sm z-10 shrink-0 ${
+                    step > s.n 
+                      ? 'bg-emerald-50 text-emerald-600' 
+                      : step === s.n 
+                        ? 'bg-brand-900 text-brand-50' 
+                        : 'bg-brand-100 text-brand-800/40'
+                  }`}>
+                    {step > s.n ? '✓' : s.n}
+                  </div>
+                  <span className={`text-[10px] tracking-[0.2em] uppercase font-bold whitespace-nowrap ${
+                    step >= s.n ? 'text-brand-900' : 'text-brand-800/30'
+                  }`}>
+                    {s.label}
+                  </span>
+                  {i < 3 && (
+                    <div className="hidden sm:block absolute top-5 left-1/2 w-full h-[1px] bg-brand-900/10 -z-0 ml-5"></div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         )}
 
         {step === 1 && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="grid gap-4">
-              {services.map(service => (
+          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 max-w-5xl mx-auto">
+            <h2 className="font-serif text-3xl text-brand-900 mb-10 font-light">Choose a service</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {services.map((service, idx) => (
                 <div 
                   key={service.id} 
                   onClick={() => setSelectedService(service)}
-                  className={`p-6 md:p-8 rounded-3xl cursor-pointer transition-all border ${
+                  className={`group relative p-4 sm:p-6 rounded-[2rem] sm:rounded-[2.5rem] cursor-pointer transition-all duration-500 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 border-2 ${
                     selectedService?.id === service.id 
-                      ? 'bg-transparent border-brand-900 shadow-md ring-1 ring-brand-900' 
-                      : 'bg-white border-transparent hover:border-brand-300'
+                      ? 'bg-white border-brand-900 shadow-xl shadow-brand-900/5' 
+                      : 'bg-white/40 border-transparent hover:bg-white hover:border-brand-200'
                   }`}
                 >
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-serif text-2xl text-brand-900">{service.name}</h3>
-                    <div className="flex items-center gap-4 text-sm font-medium tracking-widest uppercase">
-                      <span>{service.duration_minutes}m</span>
-                      <span>${service.price}</span>
-                    </div>
+                  <div className="w-full sm:w-20 h-32 sm:h-20 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm flex-shrink-0">
+                    <img 
+                      src={service.image_url || `https://images.unsplash.com/photo-${[
+                        '1522337660859-02fbefca4702',
+                        '1594465919760-441fe5908ab0',
+                        '1596462502278-27bfdc403348',
+                        '1612817288484-6f916006741a',
+                        '1616683693504-3ea7e9ad6fec',
+                        '1596704017254-9b121068fb31',
+                        '1580870059885-a4b5d63428df',
+                        '1487412720507-e7ab37603c6f'
+                      ][idx % 8]}?q=80&w=400&auto=format&fit=crop`}
+                      alt={service.name}
+                      className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700"
+                    />
                   </div>
-                  <p className="text-slate-600 leading-relaxed max-w-2xl">{service.description}</p>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className="font-serif text-xl text-brand-900">{service.name}</h3>
+                      <span className="text-sm font-bold text-brand-900">${service.price}</span>
+                    </div>
+                    <p className="text-[10px] tracking-[0.15em] uppercase font-bold text-brand-800/40 mb-2">{service.duration_minutes} Min Session</p>
+                    <p className="text-xs text-brand-800/60 leading-relaxed line-clamp-2 font-light">
+                      {service.description}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-12 flex justify-end">
+            <div className="mt-16 flex justify-center">
               <button 
                 disabled={!selectedService}
                 onClick={() => setStep(2)}
-                className="bg-brand-900 text-brand-100 px-10 py-4 rounded-full uppercase tracking-widest text-xs font-semibold disabled:opacity-50 hover:bg-brand-800 transition-colors"
+                className="bg-brand-900 text-brand-50 px-16 py-5 rounded-full uppercase tracking-[0.2em] text-[11px] font-bold disabled:opacity-30 hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/10 flex items-center gap-4"
               >
-                Continue
+                Continue to date & time
+                <ArrowRight className="w-4 h-4 opacity-50" />
               </button>
             </div>
           </div>
         )}
 
         {step === 2 && (
-          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-            <button onClick={() => setStep(1)} className="flex items-center gap-2 text-sm uppercase tracking-widest text-slate-500 hover:text-brand-900 mb-8 transition-colors">
-              <ArrowLeft className="w-4 h-4" /> Back to Services
-            </button>
+          <div className="animate-in fade-in slide-in-from-right-8 duration-700 max-w-5xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="font-serif text-3xl text-brand-900 font-light">Select a date & time</h2>
+              <button onClick={() => setStep(1)} className="text-[11px] font-bold uppercase tracking-[0.15em] text-brand-800/40 hover:text-brand-900 transition-colors flex items-center gap-2">
+                ← Change service
+              </button>
+            </div>
             
-            <div className="bg-white rounded-[2rem] p-6 md:p-10 premium-shadow">
-              <div className="grid lg:grid-cols-2 gap-12">
-                <div>
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="font-serif text-xl text-brand-900">{format(currentMonth, "MMMM yyyy")}</h3>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                        disabled={isBefore(currentMonth, startOfMonth(new Date()))}
-                        className="p-2 bg-slate-50 text-slate-500 rounded-lg hover:bg-brand-200 hover:text-brand-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                        className="p-2 bg-slate-50 text-slate-500 rounded-lg hover:bg-brand-200 hover:text-brand-900"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-7 gap-2 mb-2 text-center text-[10px] sm:text-xs tracking-widest uppercase text-slate-400">
-                    {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(d => <div key={d}>{d}</div>)}
-                  </div>
-                  <div className="grid grid-cols-7 gap-1 sm:gap-2">
-                    {calendarDays.map(date => {
-                      const isSelected = selectedDate && isSameDay(date, selectedDate);
-                      const isPast = isBefore(startOfDay(date), startOfDay(new Date()));
-                      const notInMonth = !isSameMonth(date, currentMonth);
-                      
-                      const isBlocked = blockedDates.some(b => b.blocked_date === format(date, 'yyyy-MM-dd'));
-                      const isClosed = !businessHours.find(h => h.weekday === date.getDay())?.is_open;
-                      const disabled = isPast || isBlocked || isClosed;
+            <div className="bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-8 md:p-12 shadow-xl shadow-brand-900/5">
+              <div className="mb-10 sm:mb-12 overflow-x-auto pb-4 -mx-2 sm:-mx-4 px-2 sm:px-4 scrollbar-hide">
+                <div className="flex gap-4 min-w-max">
+                  {eachDayOfInterval({ 
+                    start: startOfDay(new Date()), 
+                    end: addMonths(startOfDay(new Date()), 2) 
+                  }).map(date => {
+                    const isSelected = selectedDate && isSameDay(date, selectedDate);
+                    const isBlocked = blockedDates.some(b => b.blocked_date === format(date, 'yyyy-MM-dd'));
+                    const isClosed = !businessHours.find(h => h.weekday === date.getDay())?.is_open;
+                    const disabled = isBlocked || isClosed;
 
+                    return (
+                      <button
+                        key={date.toISOString()}
+                        disabled={disabled}
+                        onClick={() => { setSelectedDate(date); setSelectedTimeSlot(null); }}
+                        className={`flex flex-col items-center justify-center min-w-[80px] h-24 rounded-3xl transition-all duration-300 border-2 ${
+                          disabled 
+                            ? 'opacity-20 cursor-not-allowed bg-transparent border-transparent' 
+                            : isSelected 
+                              ? 'bg-brand-900 border-brand-900 text-brand-50 shadow-lg shadow-brand-900/20' 
+                              : 'bg-brand-100 border-transparent text-brand-900 hover:border-brand-200'
+                        }`}
+                      >
+                        <span className="text-[10px] tracking-[0.2em] uppercase font-bold mb-1 opacity-40">{format(date, 'EEE')}</span>
+                        <span className="font-serif text-2xl font-light">{format(date, 'd')}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className={`transition-all duration-700 ease-out flex flex-col ${!selectedDate ? 'opacity-40 grayscale pointer-events-none translate-y-4' : 'opacity-100 grayscale-0 translate-y-0'}`}>
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="font-serif text-2xl text-brand-900 font-light">Available times</h3>
+                  {selectedDate && <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-800/40">{format(selectedDate, 'EEEE, MMMM do')}</span>}
+                </div>
+                
+                {!selectedDate ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-brand-800/30 italic py-20 border-2 border-dashed border-brand-100 rounded-[3rem]">
+                    Select a date to see available times
+                  </div>
+                ) : availableSlots.length === 0 ? (
+                  <div className="animate-in fade-in zoom-in-95 duration-500 py-20 bg-brand-100/50 rounded-[3rem] text-center">
+                    <p className="text-brand-800/40 italic">No availability on this date</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {availableSlots.map((slot, i) => {
+                      const isSelected = selectedTimeSlot?.start.getTime() === slot.start.getTime();
                       return (
                         <button
-                          key={date.toISOString()}
-                          disabled={disabled || notInMonth}
-                          onClick={() => { setSelectedDate(date); setSelectedTimeSlot(null); }}
-                          className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-2xl transition-all aspect-square ${
-                            notInMonth ? 'opacity-0 cursor-default pointer-events-none' :
-                            disabled 
-                              ? 'opacity-30 cursor-not-allowed bg-slate-50 text-slate-400' 
-                              : isSelected 
-                                ? 'bg-brand-900 text-brand-100 shadow-md ring-2 ring-brand-900 ring-offset-2' 
-                                : 'bg-slate-50 hover:bg-brand-200 text-brand-900 hover:shadow-sm'
+                          key={i}
+                          onClick={() => setSelectedTimeSlot(slot)}
+                          className={`py-4 rounded-2xl text-[11px] font-bold tracking-[0.1em] transition-all duration-300 border-2 ${
+                            isSelected 
+                              ? 'bg-brand-900 border-brand-900 text-brand-50 shadow-lg shadow-brand-900/10' 
+                              : 'bg-brand-100 border-transparent text-brand-900 hover:border-brand-200'
                           }`}
                         >
-                          <span className="font-serif text-lg sm:text-xl">{format(date, 'd')}</span>
+                          {slot.label.replace(' ', '')}
                         </button>
                       );
                     })}
                   </div>
-                </div>
-
-                <div>
-                  <h3 className="font-serif text-xl text-brand-900 mb-6">Available Times</h3>
-                  
-                  {!selectedDate ? (
-                    <div className="h-full flex flex-col items-center justify-center text-slate-400 italic py-12 lg:py-0 border-2 border-dashed border-slate-100 rounded-3xl">
-                      Select a date to see times
-                    </div>
-                  ) : availableSlots.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center text-slate-400 italic py-12 lg:py-0 border-2 border-dashed border-slate-100 rounded-3xl">
-                      No availability on this date
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                      {availableSlots.map((slot, i) => {
-                        const isSelected = selectedTimeSlot?.start.getTime() === slot.start.getTime();
-                        return (
-                          <button
-                            key={i}
-                            onClick={() => setSelectedTimeSlot(slot)}
-                            className={`py-4 rounded-xl text-sm font-medium tracking-wide transition-all ${
-                              isSelected 
-                                ? 'bg-brand-900 text-brand-100 ring-2 ring-brand-900 ring-offset-2' 
-                                : 'bg-slate-50 text-brand-900 hover:bg-brand-200'
-                            }`}
-                          >
-                            {slot.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </div>
 
-            <div className="mt-12 flex justify-end">
+            <div className="mt-16 flex justify-center">
               <button 
                 disabled={!selectedTimeSlot}
                 onClick={() => setStep(3)}
-                className="bg-brand-900 text-brand-100 px-10 py-4 rounded-full uppercase tracking-widest text-xs font-semibold disabled:opacity-50 hover:bg-brand-800 transition-colors"
+                className="bg-brand-900 text-brand-50 px-16 py-5 rounded-full uppercase tracking-[0.2em] text-[11px] font-bold disabled:opacity-30 hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/10 flex items-center gap-4"
               >
-                Continue
+                Continue to details
+                <ArrowRight className="w-4 h-4 opacity-50" />
               </button>
             </div>
           </div>
@@ -373,9 +435,9 @@ export default function Booking() {
               <ArrowLeft className="w-4 h-4" /> Back to Details
             </button>
 
-            <div className="grid md:grid-cols-3 gap-12">
+            <div className="grid md:grid-cols-3 gap-8 md:gap-12">
               <div className="md:col-span-2">
-                <form id="booking-form" onSubmit={handleSubmit} className="bg-white rounded-[2rem] p-8 md:p-10 premium-shadow space-y-6">
+                <form id="booking-form" onSubmit={handleSubmit} className="bg-white rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-xl shadow-brand-900/5 space-y-6">
                   <h3 className="font-serif text-2xl text-brand-900 mb-6">Your Details</h3>
                   
                   <div className="space-y-4">
@@ -425,8 +487,8 @@ export default function Booking() {
                 </form>
               </div>
 
-              <div className="md:col-span-1">
-                <div className="bg-brand-900 text-brand-100 rounded-[2rem] p-8 sticky top-32">
+              <div className="md:col-span-1 flex flex-col-reverse md:flex-col">
+                <div className="bg-brand-900 text-brand-50 rounded-[2rem] p-6 sm:p-8 mt-8 md:mt-0 md:sticky md:top-32 shadow-xl shadow-brand-900/20">
                   <h3 className="font-serif text-xl mb-8 text-brand-300">Session Summary</h3>
                   
                   <div className="space-y-6">
@@ -478,58 +540,58 @@ export default function Booking() {
           <div className="animate-in zoom-in-95 duration-500 max-w-lg mx-auto text-center py-20">
             {isCancelled ? (
               <>
-                <div className="w-24 h-24 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-8 premium-shadow">
+                <div className="w-24 h-24 bg-brand-50 text-brand-900 shadow-xl shadow-brand-900/5 rounded-full flex items-center justify-center mx-auto mb-8">
                   <XCircle className="w-12 h-12" />
                 </div>
                 
-                <h2 className="font-serif text-4xl text-brand-900 mb-4">Booking Cancelled.</h2>
-                <p className="text-slate-600 leading-relaxed mb-10">
+                <h2 className="font-serif text-4xl sm:text-5xl text-brand-900 mb-6 font-light">Session Cancelled</h2>
+                <p className="text-brand-800/60 leading-relaxed font-light mb-12">
                   Your session request has been successfully cancelled. You can book a new session at any time.
                 </p>
 
                 <Link 
                   to="/"
-                  className="inline-flex items-center text-sm uppercase tracking-widest text-brand-900 font-medium hover:text-amber-700 transition-colors"
+                  className="inline-flex items-center text-[11px] uppercase tracking-[0.2em] font-bold text-brand-900 hover:text-brand-700 transition-colors"
                 >
                   Return Home
                 </Link>
               </>
             ) : (
               <>
-                <div className="w-24 h-24 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 premium-shadow">
+                <div className="w-24 h-24 bg-brand-900 text-brand-50 shadow-xl shadow-brand-900/10 rounded-full flex items-center justify-center mx-auto mb-8">
                   <CheckCircle2 className="w-12 h-12" />
                 </div>
                 
-                <h2 className="font-serif text-4xl text-brand-900 mb-4">Request sent.</h2>
-                <p className="text-slate-600 leading-relaxed mb-10">
+                <h2 className="font-serif text-4xl sm:text-5xl text-brand-900 mb-6 font-light">See you soon.</h2>
+                <p className="text-brand-800/60 leading-relaxed font-light mb-12">
                   Thank you, {form.name.split(' ')[0]}. Your session request has been received. You will receive an email confirmation shortly containing details about your appointment and preparation steps.
                 </p>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 text-left mb-10 inline-block w-full">
-                  <p className="font-serif text-xl border-b border-slate-100 pb-4 mb-4 text-brand-900">
+                <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-brand-900/5 text-left mb-12 inline-block w-full">
+                  <p className="font-serif text-2xl border-b border-brand-100 pb-6 mb-6 text-brand-900 font-light">
                     {selectedDate && format(selectedDate, 'EEEE, MMMM d, yyyy')}
                   </p>
                   <div className="flex justify-between items-center text-sm font-medium">
-                    <span className="text-slate-500 uppercase tracking-widest">Time</span>
+                    <span className="text-[10px] tracking-[0.2em] font-bold uppercase text-brand-800/40">Time</span>
                     <span className="text-brand-900 text-base">{selectedTimeSlot?.label}</span>
                   </div>
-                  <div className="flex justify-between items-center text-sm font-medium mt-3">
-                    <span className="text-slate-500 uppercase tracking-widest">Service</span>
+                  <div className="flex justify-between items-center text-sm font-medium mt-4">
+                    <span className="text-[10px] tracking-[0.2em] font-bold uppercase text-brand-800/40">Service</span>
                     <span className="text-brand-900 text-base">{selectedService?.name}</span>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
                   <button
                     onClick={handleCancelBooking}
                     disabled={isCancelling}
-                    className="text-sm uppercase tracking-widest text-red-500 font-medium hover:text-red-700 transition-colors disabled:opacity-50"
+                    className="text-[11px] uppercase tracking-[0.2em] text-red-900/50 font-bold hover:text-red-900 transition-colors disabled:opacity-50"
                   >
                     {isCancelling ? "Cancelling..." : "Cancel Booking"}
                   </button>
                   <Link 
                     to="/"
-                    className="inline-flex items-center text-sm uppercase tracking-widest text-brand-900 font-medium hover:text-amber-700 transition-colors"
+                    className="inline-flex px-10 py-5 bg-brand-900 text-brand-50 rounded-full items-center text-[11px] uppercase tracking-[0.2em] font-bold shadow-xl shadow-brand-900/10 hover:bg-brand-800 transition-colors"
                   >
                     Return Home
                   </Link>

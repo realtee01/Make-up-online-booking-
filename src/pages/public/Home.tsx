@@ -1,156 +1,243 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { Service } from "../../types";
 import { ArrowRight, Sparkles, Clock } from "lucide-react";
 
 export default function Home() {
   const [services, setServices] = useState<Service[]>([]);
+  const [isLoadingServices, setIsLoadingServices] = useState(true);
+  
+  // Provided by PublicLayout
+  const { businessName, businessDescription } = useOutletContext<{ 
+    businessName: string, 
+    businessDescription: string 
+  }>();
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchServices() {
-      const { data, error } = await supabase
-        .from("services")
-        .select("*")
-        .eq("is_active", true)
-        .order("created_at", { ascending: true });
+      setIsLoadingServices(true);
+      try {
+        const { data, error } = await supabase
+          .from("services")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", { ascending: true });
 
-      if (!error && data) {
-        setServices(data);
+        if (isMounted && !error && data) {
+          const parsedData = data.map(service => {
+            let desc = service.description || "";
+            let imgUrl = undefined;
+            if (desc.includes("|||IMAGE_URL|||")) {
+               const parts = desc.split("|||IMAGE_URL|||");
+               desc = parts[0];
+               imgUrl = parts[1];
+            }
+            return { ...service, description: desc, image_url: imgUrl };
+          });
+          setServices(parsedData);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch services:", err);
+      } finally {
+        if (isMounted) {
+          setIsLoadingServices(false);
+        }
       }
     }
     fetchServices();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-brand-50">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#1C1A19]">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1512496350731-92ebc9deea63?q=80&w=2670&auto=format&fit=crop" 
-            alt="Makeup Studio" 
-            className="w-full h-full object-cover opacity-50 transition-transform duration-1000 scale-105"
-          />
-          {/* Subtle Dust/Sparkle Texture Overlay */}
-          <div 
-            className="absolute inset-0 opacity-[0.15] mix-blend-color-dodge" 
-            style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' }}
-          ></div>
-          {/* Enhanced Gradient Overlays for depth */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1C1A19] via-[#1C1A19]/50 to-transparent"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1C1A19]/70 via-transparent to-transparent"></div>
-        </div>
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center text-brand-100 flex flex-col items-center">
-          <span className="text-brand-300 uppercase tracking-[0.3em] text-sm mb-6 flex items-center gap-2">
-            <Sparkles className="w-4 h-4" /> 
-            Premium Beauty Services
-            <Sparkles className="w-4 h-4" />
-          </span>
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.1] mb-8 font-light tracking-tight">
-            Refined artistry <br/>
-            <span className="italic text-brand-300">for the modern</span> <br/>
-            romantic.
-          </h1>
-          <p className="max-w-xl text-lg md:text-xl font-sans font-light opacity-80 mb-12 leading-relaxed">
-            Specializing in soft glam, bridal, and editorial looks. We enhance your natural elegance so you feel profoundly yourself, only more radiant.
-          </p>
-          <Link 
-            to="/book" 
-            className="group relative inline-flex items-center justify-center px-8 py-4 text-xs tracking-widest uppercase bg-brand-100 text-brand-900 hover:bg-white transition-all overflow-hidden rounded-full font-medium"
-          >
-            <span>Reserve Your Session</span>
-            <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section id="services" className="py-32 bg-brand-100 z-10 relative rounded-t-[3rem] -mt-12 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-12 gap-16 lg:gap-24">
-            <div className="lg:col-span-4 lg:sticky lg:top-32 self-start">
-              <span className="text-brand-800/50 uppercase tracking-widest text-xs font-semibold mb-4 block">The Offering</span>
-              <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-brand-900 leading-tight mb-6">
-                Curated <span className="italic text-brand-800">beauty</span> experiences.
-              </h2>
-              <p className="text-brand-800/70 leading-relaxed mb-8">
-                From flawless bridal preparations to camera-ready photoshoot pacing, every session is tailored to your unique features and vision.
-              </p>
+      <section className="relative min-h-[85vh] flex items-center pt-8 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10 w-full">
+          <div className="animate-in fade-in slide-in-from-left-8 duration-1000 ease-out">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-brand-200 mb-8 shadow-sm">
+              <span className="w-1.5 h-1.5 bg-brand-300 rounded-full animate-pulse"></span>
+              <span className="text-[11px] tracking-[0.2em] font-bold uppercase text-brand-800/60">Now Booking · Spring Season</span>
             </div>
             
-            <div className="lg:col-span-8 flex flex-col gap-8">
-              {services.map((service, idx) => (
-                <div key={service.id} className="group relative bg-white p-8 md:p-10 rounded-[2rem] premium-shadow border border-brand-200/50 hover:border-brand-300 transition-all flex flex-col md:flex-row gap-8 justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-serif text-2xl md:text-3xl text-brand-900 mb-3 group-hover:text-amber-800 transition-colors">{service.name}</h3>
-                    <p className="text-brand-800/70 leading-relaxed mb-6 max-w-md">{service.description}</p>
-                    <div className="flex items-center gap-6 text-sm uppercase tracking-widest text-brand-900/60 font-medium">
-                      <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> {service.duration_minutes} Mins</span>
-                      <span>—</span>
-                      <span>${service.price}</span>
-                    </div>
-                  </div>
-                  <div className="md:self-end">
-                    <Link 
-                      to="/book" 
-                      state={{ selectedServiceId: service.id }}
-                      className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-brand-200 text-brand-900 group-hover:bg-brand-900 group-hover:text-brand-100 transition-all"
-                    >
-                      <ArrowRight className="w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform" />
-                    </Link>
-                  </div>
+            <h1 className="font-serif text-5xl sm:text-6xl lg:text-[100px] leading-[1.1] sm:leading-[1] text-brand-900 mb-8 font-light tracking-tight">
+              Soft light, <br className="hidden sm:block" />
+              <span className="italic text-brand-800/40">refined</span> beauty.
+            </h1>
+            
+            <p className="max-w-md text-lg text-brand-800/60 mb-12 leading-relaxed font-light">
+              Maison Lumière is an intimate makeup atelier crafting bridal, editorial, and event looks tailored to your features, lighting, and the moment you're getting ready for.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8 mb-12 sm:mb-16">
+              <Link 
+                to="/book" 
+                className="group px-8 py-4 sm:px-10 sm:py-5 bg-brand-900 text-brand-50 rounded-full text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-brand-800 transition-all shadow-xl shadow-brand-900/10 flex items-center justify-center gap-4"
+              >
+                Reserve your session
+                <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <nav className="flex justify-center gap-8 text-[11px] tracking-[0.1em] text-brand-800 font-bold uppercase border-b border-brand-900/10 pb-1 hover:border-brand-900 transition-all cursor-pointer">
+                <a href="#services">View the menu</a>
+              </nav>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-8 sm:gap-12 justify-center sm:justify-start">
+              <div className="flex flex-col">
+                <span className="text-2xl font-serif text-brand-900 leading-none mb-1">12+</span>
+                <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-brand-800/40">Years<br/>Artistry</span>
+              </div>
+              <div className="w-px h-10 bg-brand-200"></div>
+              <div className="flex flex-col">
+                <span className="text-2xl font-serif text-brand-900 leading-none mb-1">400+</span>
+                <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-brand-800/40">Brides<br/>Prepared</span>
+              </div>
+              <div className="w-px h-10 bg-brand-200"></div>
+              <div className="flex gap-1 text-amber-500/60">
+                {[1, 2, 3, 4, 5].map(s => <span key={s} className="text-lg">★</span>)}
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative animate-in fade-in slide-in-from-right-12 duration-1000 ease-out delay-200">
+            <div className="aspect-[10/12] rounded-[4rem] overflow-hidden shadow-2xl shadow-brand-900/10">
+              <img 
+                src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=2669&auto=format&fit=crop" 
+                alt="Refined Makeup Artistry" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {/* Absolute Floating Badge on Image */}
+            <div className="absolute bottom-4 left-4 sm:bottom-10 sm:left-[-40px] right-4 sm:right-auto bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-xl shadow-brand-900/10 border border-white/50 sm:max-w-[280px]">
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <p className="text-[11px] tracking-[0.1em] uppercase font-bold text-brand-800/60 mb-1">Bridal · Editorial · Event</p>
+                  <p className="text-xs text-brand-800/40 font-medium">By appointment only</p>
                 </div>
-              ))}
-              
-              {services.length === 0 && (
-                <div className="text-slate-400 italic">No services available at the moment.</div>
-              )}
+                <div className="w-10 h-10 bg-brand-900 rounded-full flex items-center justify-center text-brand-50">
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-24 bg-brand-200/50">
+      {/* Services Section */}
+      <section id="services" className="py-40">
         <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-12 items-end mb-24">
+            <div>
+              <span className="text-[11px] tracking-[0.3em] uppercase font-bold text-brand-800/40 mb-6 block">The Menu</span>
+              <h2 className="font-serif text-5xl md:text-6xl text-brand-900 leading-tight">
+                Signature services
+              </h2>
+            </div>
+            <div className="max-w-md ml-auto text-right">
+              <p className="text-brand-800/60 leading-relaxed font-light">
+                Each session is built around your features and the lighting of your event — long-wear formulas, hand-mixed shades, on-camera tested.
+              </p>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {isLoadingServices ? (
+              [1, 2, 3].map(i => (
+                <div key={i} className="aspect-[4/5] rounded-[3rem] bg-brand-100 animate-pulse"></div>
+              ))
+            ) : services.length === 0 ? (
+              <div className="text-brand-800/40 italic py-12">No signature services available at the moment.</div>
+            ) : (
+              services.map((service, idx) => (
+                <div key={service.id} className="group cursor-pointer">
+                  <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden mb-8 shadow-sm transition-all duration-500 group-hover:shadow-xl group-hover:shadow-brand-900/5 group-hover:-translate-y-1">
+                    <img 
+                      src={service.image_url || `https://images.unsplash.com/photo-${[
+                        '1522337660859-02fbefca4702',
+                        '1594465919760-441fe5908ab0',
+                        '1596462502278-27bfdc403348',
+                        '1612817288484-6f916006741a',
+                        '1616683693504-3ea7e9ad6fec',
+                        '1596704017254-9b121068fb31',
+                        '1580870059885-a4b5d63428df',
+                        '1487412720507-e7ab37603c6f'
+                      ][idx % 8]}?q=80&w=1200&auto=format&fit=crop`}
+                      alt={service.name}
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    />
+                    <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-sm">
+                      <span className="text-[13px] font-bold text-brand-900 tracking-wider">${service.price}</span>
+                    </div>
+                  </div>
+                  <div className="px-2">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-serif text-2xl text-brand-900 leading-none">{service.name}</h3>
+                      <span className="flex items-center gap-3 text-[11px] tracking-[0.1em] uppercase font-bold text-brand-800/40 whitespace-nowrap">
+                        <Clock className="w-3 h-3" /> {service.duration_minutes} min
+                      </span>
+                    </div>
+                    <p className="text-[14px] text-brand-800/60 leading-relaxed font-light line-clamp-3">
+                      {service.description}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-40 bg-white relative overflow-hidden">
+        {/* Decorative Background Element */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid md:grid-cols-2 gap-16 md:gap-24 items-center">
-            <div className="relative">
-              <div className="aspect-[3/4] rounded-t-[10rem] overflow-hidden relative z-10 w-4/5">
+            <div className="relative animate-in fade-in slide-in-from-left-12 duration-1000">
+              <div className="aspect-[4/5] rounded-[4rem] overflow-hidden shadow-2xl shadow-brand-900/10">
                 <img 
-                  src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=2000&auto=format&fit=crop" 
-                  alt="Makeup application detail" 
+                  src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Artist at work" 
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute bottom-10 right-0 w-2/3 aspect-square rounded-full overflow-hidden border-8 border-brand-100 z-20 premium-shadow">
+              <div className="absolute -bottom-12 -right-12 w-64 aspect-square rounded-[3rem] overflow-hidden border-[12px] border-white shadow-2xl hidden lg:block">
                 <img 
-                  src="https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=2000&auto=format&fit=crop" 
-                  alt="Makeup artist tools" 
+                  src="https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Makeup detail" 
                   className="w-full h-full object-cover"
                 />
               </div>
             </div>
             
             <div>
-              <span className="text-brand-800/50 uppercase tracking-widest text-xs font-semibold mb-6 block">The Studio</span>
-              <h2 className="font-serif text-4xl md:text-5xl text-brand-900 leading-tight mb-8">
-                Enhancing your <span className="italic">natural architecture</span>.
+              <span className="text-[11px] tracking-[0.3em] uppercase font-bold text-brand-800/40 mb-8 block">The Studio</span>
+              <h2 className="font-serif text-5xl md:text-6xl text-brand-900 mb-10 leading-tight font-light">
+                Artistry focused on <br/>
+                <span className="italic text-brand-800/40">presence</span>.
               </h2>
-              <div className="space-y-6 text-brand-800/70 leading-relaxed font-light text-lg">
+              <div className="space-y-6 text-brand-800/60 leading-relaxed font-light text-lg">
                 <p>
-                  Studio Elegance was founded on a simple philosophy: makeup should elevate, not mask. We specialize in polished, breathable looks that translate beautifully in person and on camera.
+                  At Maison Lumière, we believe makeup should never feel like a mask. Our signature approach is rooted in color theory and the study of light — ensuring your look translates as beautifully in person as it does through a lens.
                 </p>
-                <p>
-                  From strict hygiene protocols to curating the finest luxury cosmetics, every detail of our studio environment is designed to provide a serene, trusting, and premium experience.
+                <p className="whitespace-pre-wrap">
+                  {businessDescription}
                 </p>
               </div>
               
-              <div className="mt-12 inline-flex flex-col">
-                <Link to="/book" className="text-sm font-medium uppercase tracking-widest text-brand-900 hover:text-amber-700 transition-colors pb-2 border-b border-brand-900 flex items-center gap-2">
-                  Plan your visit <ArrowRight className="w-4 h-4" />
-                </Link>
+              <div className="mt-12 pt-12 border-t border-brand-900/10 grid grid-cols-2 gap-12">
+                <div>
+                  <h4 className="text-[11px] tracking-[0.2em] uppercase font-bold text-brand-900 mb-4">Location</h4>
+                  <p className="text-sm text-brand-800/60 leading-relaxed font-light italic">Paris · Stockholm · Worldwide</p>
+                </div>
+                <div>
+                  <h4 className="text-[11px] tracking-[0.2em] uppercase font-bold text-brand-900 mb-4">Philosophy</h4>
+                  <p className="text-sm text-brand-800/60 leading-relaxed font-light italic">Timeless, luminous, effortless</p>
+                </div>
               </div>
             </div>
           </div>

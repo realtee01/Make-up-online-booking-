@@ -105,49 +105,49 @@ export default function BusinessHoursConfig() {
         </button>
       </header>
 
-      <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-        <div className="divide-y divide-slate-100">
+      <div className="bg-white border border-slate-100 rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <div className="divide-y divide-slate-100/80">
           {hours.map((h) => (
-            <div key={h.weekday} className={`p-6 flex flex-col md:flex-row items-center justify-between gap-6 ${!h.is_open ? 'bg-slate-50' : ''}`}>
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <label className="relative inline-flex items-center cursor-pointer">
+            <div key={h.weekday} className={`p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-colors duration-300 ${!h.is_open ? 'bg-slate-50/50 grayscale-[20%]' : 'hover:bg-brand-50/10'}`}>
+              <div className="flex items-center gap-6 w-full md:w-auto">
+                <label className="relative inline-flex items-center cursor-pointer group">
                   <input 
                     type="checkbox" 
                     className="sr-only peer" 
                     checked={h.is_open}
                     onChange={(e) => updateDay(h.weekday, 'is_open', e.target.checked)}
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                  <div className="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all after:shadow-sm peer-checked:bg-emerald-500 group-hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] transition-all"></div>
                 </label>
-                <span className={`font-serif text-xl w-24 ${h.is_open ? 'text-brand-900' : 'text-slate-400'}`}>
+                <span className={`font-serif text-2xl w-32 ${h.is_open ? 'text-brand-900 font-medium' : 'text-slate-400'}`}>
                   {WEEKDAYS[h.weekday]}
                 </span>
               </div>
 
               {h.is_open ? (
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                  <div className="flex flex-col">
-                    <label className="text-xs uppercase tracking-widest text-slate-400 mb-1">Opening</label>
+                <div className="flex items-center gap-4 w-full md:w-auto bg-white/50 p-2 border border-slate-100 rounded-2xl shadow-sm">
+                  <div className="flex flex-col relative px-2">
+                    <label className="text-[10px] uppercase tracking-widest font-semibold text-slate-400 mb-1 absolute -top-4 left-3 bg-white px-1">Opening</label>
                     <input 
                       type="time" 
-                      value={h.start_time}
+                      value={h.start_time || ""}
                       onChange={(e) => updateDay(h.weekday, 'start_time', e.target.value)}
-                      className="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-300 font-sans"
+                      className="px-4 py-2 border-none bg-transparent rounded-lg focus:ring-0 font-medium text-brand-900 cursor-pointer"
                     />
                   </div>
-                  <span className="text-slate-300 mt-5">-</span>
-                  <div className="flex flex-col">
-                    <label className="text-xs uppercase tracking-widest text-slate-400 mb-1">Closing</label>
+                  <span className="text-slate-200 h-8 w-px bg-slate-200 block"></span>
+                  <div className="flex flex-col relative px-2">
+                    <label className="text-[10px] uppercase tracking-widest font-semibold text-slate-400 mb-1 absolute -top-4 left-3 bg-white px-1">Closing</label>
                     <input 
                       type="time" 
-                      value={h.end_time}
+                      value={h.end_time || ""}
                       onChange={(e) => updateDay(h.weekday, 'end_time', e.target.value)}
-                      className="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-300 font-sans"
+                      className="px-4 py-2 border-none bg-transparent rounded-lg focus:ring-0 font-medium text-brand-900 cursor-pointer"
                     />
                   </div>
                 </div>
               ) : (
-                <div className="text-slate-400 italic text-sm w-full md:w-auto md:text-right pr-4">
+                <div className="flex items-center gap-2 text-slate-400 font-medium tracking-wide w-full md:w-auto md:text-right pr-4 uppercase text-sm">
                   Closed
                 </div>
               )}

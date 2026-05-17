@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PublicLayout from "./components/layout/PublicLayout";
 import Home from "./pages/public/Home";
 import Booking from "./pages/public/Booking";
+import Contact from "./pages/public/Contact";
 import AdminLayout from "./components/layout/AdminLayout";
 import Login from "./pages/admin/Login";
 import DashboardHome from "./pages/admin/DashboardHome";
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<Home />} />
           <Route path="book" element={<Booking />} />
+          <Route path="contact" element={<Contact />} />
         </Route>
 
         {/* Admin Login */}

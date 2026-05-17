@@ -78,64 +78,64 @@ export default function BusinessSettingsConfig() {
         <p className="text-slate-500">Configure your studio details and booking rules.</p>
       </header>
 
-      <form onSubmit={handleSave} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-8">
+      <form onSubmit={handleSave} className="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-12">
         <div>
-          <h2 className="text-xl font-serif text-brand-900 mb-6 border-b border-slate-100 pb-4">Studio Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h2 className="text-2xl font-serif text-brand-900 mb-8 pb-4 relative after:absolute after:bottom-0 after:left-0 after:w-16 after:h-px after:bg-brand-900/20">Studio Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2">Studio Name</label>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-2.5">Studio Name</label>
               <input
                 required
                 type="text"
                 value={settings.business_name || ""}
                 onChange={(e) => setSettings({...settings, business_name: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300"
+                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300 focus:border-brand-300 transition-colors font-medium text-brand-900"
               />
             </div>
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2">Studio Email</label>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-2.5">Studio Email</label>
               <input
                 required
                 type="email"
                 value={settings.business_email || ""}
                 onChange={(e) => setSettings({...settings, business_email: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300"
+                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300 focus:border-brand-300 transition-colors font-medium text-brand-900"
               />
             </div>
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2">Studio Phone</label>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-2.5">Studio Phone</label>
               <input
                 required
                 type="tel"
                 value={settings.business_phone || ""}
                 onChange={(e) => setSettings({...settings, business_phone: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300"
+                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300 focus:border-brand-300 transition-colors font-medium text-brand-900"
               />
             </div>
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2">Studio Address</label>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-2.5">Studio Address</label>
               <input
                 required
                 type="text"
                 value={settings.business_address || ""}
                 onChange={(e) => setSettings({...settings, business_address: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300"
+                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300 focus:border-brand-300 transition-colors font-medium text-brand-900"
               />
             </div>
           </div>
         </div>
 
         <div>
-          <h2 className="text-xl font-serif text-brand-900 mb-6 border-b border-slate-100 pb-4">Booking Logic</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h2 className="text-2xl font-serif text-brand-900 mb-8 pb-4 relative after:absolute after:bottom-0 after:left-0 after:w-16 after:h-px after:bg-brand-900/20">Booking Logic</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2">Slot Interval (Minutes)</label>
-              <p className="text-sm text-slate-400 mb-3">Time between available booking slots.</p>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Slot Interval (Minutes)</label>
+              <p className="text-[13px] text-slate-400 mb-3.5 italic">Time between available booking slots.</p>
               <select
                 required
                 value={settings.slot_interval_minutes || 30}
                 onChange={(e) => setSettings({...settings, slot_interval_minutes: parseInt(e.target.value)})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300"
+                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300 focus:border-brand-300 transition-colors font-medium text-brand-900 cursor-pointer"
               >
                 <option value={15}>Every 15 minutes</option>
                 <option value={30}>Every 30 minutes</option>
@@ -143,28 +143,28 @@ export default function BusinessSettingsConfig() {
               </select>
             </div>
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2">Booking Notice (Hours)</label>
-              <p className="text-sm text-slate-400 mb-3">Minimum notice required before an appointment.</p>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Booking Notice (Hours)</label>
+              <p className="text-[13px] text-slate-400 mb-3.5 italic">Minimum notice required before an appointment.</p>
               <input
                 required
                 type="number"
                 min="0"
-                value={settings.booking_notice_hours || 0}
-                onChange={(e) => setSettings({...settings, booking_notice_hours: parseInt(e.target.value)})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300"
+                value={settings.booking_notice_hours ?? ""}
+                onChange={(e) => setSettings({...settings, booking_notice_hours: e.target.value === "" ? 0 : parseInt(e.target.value)})}
+                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-300 focus:border-brand-300 transition-colors font-medium text-brand-900"
               />
             </div>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-slate-100 flex justify-end">
+        <div className="pt-8 border-t border-slate-100 flex justify-end">
           <button
             type="submit"
             disabled={saving || saveSuccess}
-            className={`flex items-center gap-2 px-8 py-3 rounded-xl text-sm tracking-wide uppercase font-medium transition-all duration-300 min-w-[160px] justify-center ${
+            className={`flex items-center gap-2 px-10 py-3.5 rounded-xl text-sm tracking-widest uppercase font-bold transition-all duration-300 min-w-[200px] justify-center shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-brand-900 ${
               saveSuccess 
-                ? "bg-emerald-500 text-white" 
-                : "bg-brand-900 text-white hover:bg-brand-800 disabled:opacity-50"
+                ? "bg-emerald-500 text-white shadow-emerald-500/20" 
+                : "bg-brand-900 text-brand-100 hover:bg-brand-800 shadow-brand-900/20 hover:shadow-lg hover:shadow-brand-900/30 disabled:opacity-50"
             }`}
           >
             {saving ? (

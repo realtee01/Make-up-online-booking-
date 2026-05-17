@@ -63,13 +63,13 @@ export default function DashboardHome() {
         {statCards.map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center ${stat.color}`}>
-                <Icon className="w-6 h-6" />
+            <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 flex items-center gap-5 group">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${stat.color}`}>
+                <Icon className="w-6 h-6 stroke-[1.5]" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-slate-500 mb-1">{stat.label}</p>
-                <p className="font-serif text-3xl text-brand-900">{stat.value}</p>
+              <div className="flex flex-col">
+                <p className="text-[11px] uppercase tracking-widest font-semibold text-slate-400 mb-1">{stat.label}</p>
+                <p className="font-serif text-3xl text-brand-900 leading-none">{stat.value}</p>
               </div>
             </div>
           );

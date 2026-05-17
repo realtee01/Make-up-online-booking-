@@ -88,49 +88,51 @@ export default function Appointments() {
       ) : (
         <div className="space-y-4">
           {filteredAppointments.map((app) => (
-            <div key={app.id} className="bg-white border border-slate-200 p-6 rounded-2xl flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+            <div key={app.id} className="bg-white border border-slate-100 p-6 rounded-3xl flex flex-col md:flex-row gap-6 justify-between items-start md:items-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_4px_24px_rgb(0,0,0,0.06)] transition-shadow duration-300 group">
               
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-slate-400 mb-1">Time & Date</p>
-                  <p className="font-serif text-lg text-brand-900">{format(new Date(app.appointment_date), 'MMM d, yyyy')}</p>
-                  <div className="flex items-center gap-1.5 text-sm text-slate-600 mt-1">
-                    <Clock className="w-4 h-4" />
+                  <p className="text-[10px] uppercase tracking-widest font-semibold text-slate-400 mb-2">Time & Date</p>
+                  <p className="font-serif text-xl text-brand-900 group-hover:text-amber-800 transition-colors">{format(new Date(app.appointment_date), 'MMM d, yyyy')}</p>
+                  <div className="flex items-center gap-2 text-sm text-slate-500 mt-2 font-medium">
+                    <Clock className="w-4 h-4 text-slate-400" />
                     {app.start_time.substring(0, 5)} - {app.end_time.substring(0, 5)}
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-slate-400 mb-1">Client</p>
-                  <p className="font-serif text-lg text-brand-900">{app.full_name}</p>
-                  <div className="flex items-center gap-1.5 text-sm text-slate-600 mt-1">
-                    <Phone className="w-4 h-4" />
-                    {app.phone}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-sm text-slate-600 mt-1">
-                    <Mail className="w-4 h-4" />
-                    {app.email}
+                  <p className="text-[10px] uppercase tracking-widest font-semibold text-slate-400 mb-2">Client</p>
+                  <p className="font-serif text-xl text-brand-900">{app.full_name}</p>
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 hover:text-brand-900 transition-colors cursor-pointer w-fit">
+                      <Phone className="w-3.5 h-3.5" />
+                      {app.phone}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 w-fit">
+                      <Mail className="w-3.5 h-3.5" />
+                      <span className="truncate max-w-[150px]" title={app.email}>{app.email}</span>
+                    </div>
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-slate-400 mb-1">Service</p>
+                  <p className="text-[10px] uppercase tracking-widest font-semibold text-slate-400 mb-2">Service</p>
                   <p className="font-medium text-brand-900">{app.services?.name || 'Unknown'}</p>
                   {app.notes && (
-                    <div className="flex items-start gap-1.5 text-sm text-slate-500 mt-2 italic">
-                      <FileText className="w-4 h-4 mt-0.5 shrink-0" />
-                      <span className="line-clamp-2">{app.notes}</span>
+                    <div className="flex items-start gap-2 text-sm text-slate-500 mt-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <FileText className="w-4 h-4 mt-0.5 shrink-0 text-slate-400" />
+                      <span className="line-clamp-2 italic">{app.notes}</span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex flex-col md:items-end gap-3 self-center">
-                  <div>
-                    <p className="text-xs uppercase tracking-widest text-slate-400 mb-2 md:text-right">Status</p>
+                <div className="flex flex-col md:items-end gap-3 self-center lg:pl-4">
+                  <div className="w-full md:w-auto">
+                    <p className="text-[10px] uppercase tracking-widest font-semibold text-slate-400 mb-2 md:text-right">Status</p>
                     <select 
-                      value={app.status}
+                      value={app.status || "pending"}
                       onChange={(e) => updateStatus(app.id, e.target.value)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider border-0 cursor-pointer ${getStatusColor(app.status)}`}
+                      className={`w-full md:w-auto px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider border-0 cursor-pointer focus:ring-2 focus:ring-brand-200 transition-all ${getStatusColor(app.status)}`}
                     >
                       <option value="pending">Pending</option>
                       <option value="confirmed">Confirmed</option>
@@ -142,7 +144,7 @@ export default function Appointments() {
                   {app.status !== 'cancelled' && app.status !== 'completed' && (
                     <button
                       onClick={() => updateStatus(app.id, 'cancelled')}
-                      className="text-[10px] sm:text-xs uppercase tracking-widest text-red-500 hover:text-red-700 font-medium flex items-center gap-1.5 transition-colors mt-2"
+                      className="text-[10px] sm:text-xs uppercase tracking-widest text-red-500 hover:text-red-700 hover:bg-red-50 py-1.5 px-3 rounded-lg font-medium flex items-center justify-center gap-1.5 transition-colors mt-1 w-full md:w-auto border border-transparent hover:border-red-100"
                     >
                       <Ban className="w-3.5 h-3.5" />
                       Cancel Booking

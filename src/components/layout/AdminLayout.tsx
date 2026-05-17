@@ -41,7 +41,12 @@ export default function AdminLayout() {
           }
         }
       } catch (err) {
-        console.error("Admin check failed", err);
+        console.warn("Admin check failed", err);
+        // Fallback state
+        if (mounted && !isAuthenticated) {
+          setIsAuthenticated(false);
+          setIsAdmin(false);
+        }
       } finally {
         if (mounted) setIsLoading(false);
       }
@@ -131,41 +136,41 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 font-sans">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#FAFAFA] font-sans selection:bg-brand-300 selection:text-brand-900 duration-500 transition-colors">
       {/* Mobile Top Header */}
-      <div className="md:hidden h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sticky top-0 z-20">
-        <span className="font-serif text-xl tracking-wide uppercase">Admin</span>
+      <div className="md:hidden h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-4 sticky top-0 z-20 shadow-sm">
+        <span className="font-serif text-xl tracking-wide uppercase text-brand-900">Admin</span>
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 text-slate-600 hover:text-brand-900 focus:outline-none"
+          className="p-2 text-slate-500 hover:text-brand-900 hover:bg-brand-50 rounded-lg transition-colors focus:outline-none"
         >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black/20 z-20 md:hidden"
+          className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-20 md:hidden transition-opacity"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200 flex flex-col z-30 transition-transform duration-300 ease-in-out md:translate-x-0 ${
+      <aside className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200/60 flex flex-col z-30 transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] md:translate-x-0 shadow-[4px_0_24px_rgba(0,0,0,0.02)] ${
         isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
       } md:static md:h-screen lg:w-64`}>
-        <div className="h-16 md:h-20 flex items-center justify-between px-6 border-b border-slate-100">
-          <span className="font-serif text-xl tracking-wide uppercase">Admin</span>
+        <div className="h-16 md:h-24 flex items-center justify-between px-8 border-b border-slate-100/50">
+          <span className="font-serif text-2xl tracking-widest uppercase text-brand-900">Admin</span>
           <button 
-            className="md:hidden p-1 text-slate-500 hover:text-brand-900"
+            className="md:hidden p-1.5 text-slate-400 hover:text-brand-900 hover:bg-slate-50 rounded-lg transition-colors"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
         
-        <div className="flex-1 overflow-y-auto py-6 flex flex-col gap-2 px-4">
+        <div className="flex-1 overflow-y-auto py-8 flex flex-col gap-1.5 px-4 scrollbar-hide">
           {navItems.map((item) => {
             const isActive = location.pathname === item.to || 
               (item.to !== "/admin" && location.pathname.startsWith(item.to + "/"));
@@ -178,33 +183,33 @@ export default function AdminLayout() {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                className={`flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-300 group relative ${
                   isMatched 
-                    ? "bg-brand-100 text-brand-900 font-medium" 
-                    : "text-slate-500 hover:bg-slate-50 hover:text-brand-900"
+                    ? "bg-brand-900 text-brand-100 shadow-md shadow-brand-900/10" 
+                    : "text-slate-500 hover:bg-brand-50 hover:text-brand-900"
                 }`}
               >
-                <Icon className="w-5 h-5" />
-                <span className="text-sm">{item.label}</span>
+                <Icon className={`w-5 h-5 transition-transform duration-300 ${isMatched ? "scale-110" : "group-hover:scale-110"}`} />
+                <span className={`text-sm font-medium tracking-wide ${isMatched ? "" : "group-hover:translate-x-1"} transition-transform duration-300`}>{item.label}</span>
               </Link>
             );
           })}
         </div>
 
-        <div className="p-4 border-t border-slate-100">
+        <div className="p-6 border-t border-slate-100/50">
           <button 
             onClick={handleSignOut}
-            className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+            className="flex items-center gap-3.5 px-4 py-3.5 w-full rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all duration-300 group"
           >
-            <LogOut className="w-5 h-5" />
-            <span className="text-sm">Sign Out</span>
+            <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+            <span className="text-sm font-medium tracking-wide group-hover:translate-x-1 transition-transform duration-300">Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8 w-full md:max-w-[calc(100vw-16rem)]">
-        <div className="max-w-6xl mx-auto">
+      <main className="flex-1 p-4 md:p-10 w-full md:max-w-[calc(100vw-16rem)] overflow-y-auto">
+        <div className="max-w-6xl mx-auto min-h-full">
           <Outlet />
         </div>
       </main>
