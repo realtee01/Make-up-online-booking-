@@ -5,6 +5,8 @@ import { BusinessSettings } from "../../types";
 import { Menu, X } from "lucide-react";
 import Preloader from "../ui/Preloader";
 
+import Logo from '../ui/Logo';
+
 export default function PublicLayout() {
   const [settings, setSettings] = useState<Partial<BusinessSettings> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,10 +71,8 @@ export default function PublicLayout() {
       >
         <header className="sticky top-0 z-50 bg-brand-50/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-900/10 rounded-full flex items-center justify-center">
-              <span className="font-serif text-brand-900 font-light text-xl">M</span>
-            </div>
+          <Link to="/" className="flex items-center gap-3 group">
+            <Logo className="w-12 h-12 text-brand-900" />
             <span className="text-2xl font-serif tracking-[0.02em] font-light text-brand-900">
               {businessName}
             </span>
@@ -126,7 +126,10 @@ export default function PublicLayout() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between gap-12 mb-20">
             <div className="max-w-xs">
-              <span className="font-serif text-2xl tracking-wide mb-6 block">{businessName}</span>
+              <Link to="/" className="flex items-center gap-3 mb-6">
+                <Logo className="w-10 h-10 text-brand-900" />
+                <span className="font-serif text-2xl tracking-wide">{businessName}</span>
+              </Link>
               <p className="text-sm text-brand-800/50 leading-relaxed font-light normal-case tracking-normal">
                 Tailored makeup artistry for bridal, editorial and special events. Focused on light and the unique architecture of your features.
               </p>

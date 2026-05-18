@@ -3,6 +3,8 @@ import { supabase } from "../../lib/supabase";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { CheckCircle2, AlertCircle, Loader2, X } from "lucide-react";
 
+import Logo from "../../components/ui/Logo";
+
 export default function Login() {
   const [email, setEmail] = useState(() => localStorage.getItem("admin_login_email") || "");
   const [password, setPassword] = useState("");
@@ -106,6 +108,7 @@ export default function Login() {
         </div>
 
         <div className="text-center mb-10 transition-all duration-300">
+          <Logo className="w-16 h-16 text-brand-900 mx-auto mb-6" />
           <h1 className="font-serif text-3xl mb-2 text-brand-900">Admin Login</h1>
           <p className="text-sm text-gray-500 font-sans tracking-wide">Studio Management Dashboard</p>
         </div>

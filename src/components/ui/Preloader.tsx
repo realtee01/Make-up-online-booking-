@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import Logo from "./Logo";
 
 interface PreloaderProps {
   businessName?: string;
@@ -40,8 +41,9 @@ export default function Preloader({ businessName = "Maison Lumière", onComplete
             initial={{ opacity: 0.5 }}
             animate={{ opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="text-center"
+            className="text-center flex flex-col items-center justify-center gap-6"
           >
+            <Logo className="w-24 h-24 text-brand-900" />
             <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-brand-900 tracking-tight font-light italic">
               {businessName}
             </h1>
