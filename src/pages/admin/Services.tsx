@@ -41,8 +41,10 @@ export default function Services() {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 800;
-        const MAX_HEIGHT = 800;
+        const ctx = canvas.getContext("2d");
+        
+        let MAX_WIDTH = 1200;
+        let MAX_HEIGHT = 1200;
         let width = img.width;
         let height = img.height;
 
@@ -58,12 +60,50 @@ export default function Services() {
           }
         }
 
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx?.drawImage(img, 0, 0, width, height);
+        const compress = (q: number, w: number, h: number) => {
+          canvas.width = w;
+          canvas.height = h;
+          // Fill background in case of transparency (though webp supports transparency, it's good practice for quality checking sometimes)
+          if (ctx) {
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+          }
+          return canvas.toDataURL("image/webp", q);
+        };
 
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+        const targetSizeBytes = 150 * 1024; // 150 KB
+        const estimateBytes = (dataUri: string) => {
+          const base64str = dataUri.split(",")[1];
+          return base64str ? Math.floor(base64str.length * 0.75) : 0;
+        };
+
+        let quality = 0.9;
+        let minQ = 0.1;
+        let maxQ = 0.9;
+        let w = width;
+        let h = height;
+        let dataUrl = compress(quality, w, h);
+        let bytes = estimateBytes(dataUrl);
+
+        // Binary search to find optimal quality to fit within 150KB
+        let attempts = 0;
+        while (bytes > targetSizeBytes && attempts < 6) {
+          maxQ = quality;
+          quality = (minQ + maxQ) / 2;
+          dataUrl = compress(quality, w, h);
+          bytes = estimateBytes(dataUrl);
+          attempts++;
+        }
+        
+        // If still too large after quality drop, slightly shrink dimensions
+        while (bytes > targetSizeBytes && attempts < 10) {
+          w *= 0.8;
+          h *= 0.8;
+          dataUrl = compress(quality, w, h);
+          bytes = estimateBytes(dataUrl);
+          attempts++;
+        }
+
         setCurrentService({ ...currentService, image_url: dataUrl });
       };
       if (event.target?.result) {
