@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useOutletContext } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { Service, BusinessHours, BlockedDate, BusinessSettings, Appointment } from "../../types";
 import { format, addMinutes, parse, startOfDay, endOfDay, isSameDay, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, addMonths, subMonths, isBefore, isSameMonth } from "date-fns";
@@ -8,6 +8,8 @@ import { CheckCircle2, ChevronRight, ChevronLeft, ArrowLeft, ArrowRight, Clock, 
 export default function Booking() {
   const location = useLocation();
   const initServiceId = location.state?.selectedServiceId;
+
+  const { setIsChildLoading } = useOutletContext<{ setIsChildLoading?: (loading: boolean) => void }>();
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -39,6 +41,7 @@ export default function Booking() {
 
   useEffect(() => {
     let isMounted = true;
+    setIsChildLoading?.(true);
     async function fetchBookingData() {
       try {
         const [
@@ -94,14 +97,16 @@ export default function Booking() {
       } finally {
         if (isMounted) {
           setLoading(false);
+          setIsChildLoading?.(false);
         }
       }
     }
     fetchBookingData();
     return () => {
       isMounted = false;
+      setIsChildLoading?.(false);
     };
-  }, [initServiceId]);
+  }, [initServiceId, setIsChildLoading]);
 
   // Generate available slots for the selected date
   const availableSlots = useMemo(() => {

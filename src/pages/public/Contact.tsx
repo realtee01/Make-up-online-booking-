@@ -1,22 +1,31 @@
 import { MapPin, Phone, Mail, Instagram, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { BusinessSettings } from "../../types";
 
 export default function Contact() {
   const [settings, setSettings] = useState<Partial<BusinessSettings> | null>(null);
+  const { setIsChildLoading } = useOutletContext<{ setIsChildLoading?: (loading: boolean) => void }>();
 
   useEffect(() => {
     let isMounted = true;
+    setIsChildLoading?.(true);
     const fetchSettings = async () => {
       const { data } = await supabase.from("business_settings").select("*").single();
       if (isMounted && data) {
         setSettings(data);
       }
+      if (isMounted) {
+        setIsChildLoading?.(false);
+      }
     };
     fetchSettings();
-    return () => { isMounted = false };
-  }, []);
+    return () => { 
+      isMounted = false;
+      setIsChildLoading?.(false);
+    };
+  }, [setIsChildLoading]);
 
   return (
     <div className="bg-brand-50 min-h-screen">

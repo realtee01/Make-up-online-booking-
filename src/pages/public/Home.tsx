@@ -9,13 +9,15 @@ export default function Home() {
   const [isLoadingServices, setIsLoadingServices] = useState(true);
   
   // Provided by PublicLayout
-  const { businessName, businessDescription } = useOutletContext<{ 
+  const { businessName, businessDescription, setIsChildLoading } = useOutletContext<{ 
     businessName: string, 
-    businessDescription: string 
+    businessDescription: string,
+    setIsChildLoading?: (loading: boolean) => void 
   }>();
 
   useEffect(() => {
     let isMounted = true;
+    setIsChildLoading?.(true);
     async function fetchServices() {
       setIsLoadingServices(true);
       try {
@@ -43,14 +45,16 @@ export default function Home() {
       } finally {
         if (isMounted) {
           setIsLoadingServices(false);
+          setIsChildLoading?.(false);
         }
       }
     }
     fetchServices();
     return () => {
       isMounted = false;
+      setIsChildLoading?.(false);
     };
-  }, []);
+  }, [setIsChildLoading]);
 
   return (
     <div className="flex flex-col bg-brand-50">

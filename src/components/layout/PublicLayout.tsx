@@ -3,11 +3,16 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { BusinessSettings } from "../../types";
 import { Menu, X } from "lucide-react";
+import Preloader from "../ui/Preloader";
 
 export default function PublicLayout() {
   const [settings, setSettings] = useState<Partial<BusinessSettings> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isChildLoading, setIsChildLoading] = useState(true);
+  const [showPreloader, setShowPreloader] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const isFullyLoading = isLoading || isChildLoading;
 
   useEffect(() => {
     let isMounted = true;
@@ -40,22 +45,29 @@ export default function PublicLayout() {
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-brand-100 selection:bg-brand-300">
-        <span className="text-sm font-medium uppercase tracking-[0.2em] text-brand-900/50 animate-pulse">
-          Loading...
-        </span>
-      </div>
-    );
-  }
-
   const businessName = settings?.business_name || "Studio Elegance";
   const businessDescription = settings?.business_description || "Refined beauty experiences for the modern romantic.";
 
+  // If we return completely here, Preloader doesn't get the updated business name until it's loaded. 
+  // It's better to render Preloader as an overlay so the rest of the app can load in the background.
+
   return (
-    <div className="min-h-screen flex flex-col font-sans text-brand-900 selection:bg-brand-300 selection:text-brand-900 transition-colors duration-500">
-      <header className="sticky top-0 z-50 bg-brand-50/80 backdrop-blur-md">
+    <>
+      {showPreloader && (
+        <Preloader 
+          businessName={businessName} 
+          onComplete={() => setShowPreloader(false)} 
+          isLoading={isFullyLoading}
+        />
+      )}
+      
+      {/* We only show the main content if we're not loading, or if we want it to render behind the preloader 
+          It's usually better to render it behind so images can start loading. */}
+      <div 
+        className={`min-h-screen flex flex-col font-sans text-brand-900 selection:bg-brand-300 selection:text-brand-900 transition-colors duration-500 ${showPreloader ? 'h-screen overflow-hidden' : ''}`}
+        style={{ opacity: isFullyLoading ? 0 : 1 }}
+      >
+        <header className="sticky top-0 z-50 bg-brand-50/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 bg-brand-900/10 rounded-full flex items-center justify-center">
@@ -107,7 +119,7 @@ export default function PublicLayout() {
       </header>
 
       <main className="flex-grow">
-        <Outlet context={{ businessName, businessDescription }} />
+        <Outlet context={{ businessName, businessDescription, setIsChildLoading }} />
       </main>
 
       <footer className="bg-brand-100 py-24 border-t border-brand-200 text-brand-900">
@@ -148,5 +160,6 @@ export default function PublicLayout() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
