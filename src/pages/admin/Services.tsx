@@ -13,8 +13,8 @@ export default function Services() {
     fetchServices();
   }, []);
 
-  async function fetchServices() {
-    setLoading(true);
+  async function fetchServices(showLoader = true) {
+    if (showLoader) setLoading(true);
     const { data, error } = await supabase.from("services").select("*").order("created_at", { ascending: false });
     if (!error && data) {
       const parsedData = data.map(service => {
@@ -29,7 +29,7 @@ export default function Services() {
       });
       setServices(parsedData);
     }
-    setLoading(false);
+    if (showLoader) setLoading(false);
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +122,27 @@ export default function Services() {
       finalDescription += "|||IMAGE_URL|||" + currentService.image_url;
     }
 
-    if (currentService.id) {
+    // Optimistic Update
+    const isNew = !currentService.id;
+    const tempId = currentService.id || crypto.randomUUID();
+    
+    // Hide form immediately
+    setIsEditing(false);
+
+    const optimisticService = {
+      ...currentService,
+      id: tempId,
+      description: finalDescription,
+      is_active: currentService.is_active !== undefined ? currentService.is_active : true
+    } as Service;
+
+    if (isNew) {
+      setServices(prev => [optimisticService, ...prev]);
+    } else {
+      setServices(prev => prev.map(s => s.id === currentService.id ? optimisticService : s));
+    }
+
+    if (!isNew) {
       // Update
       const { error } = await supabase
         .from("services")
@@ -135,9 +155,10 @@ export default function Services() {
         })
         .eq("id", currentService.id);
       
-      if (!error) {
-        setIsEditing(false);
-        fetchServices();
+      if (error) {
+        fetchServices(false); // revert
+      } else {
+        fetchServices(false);
       }
     } else {
       // Create
@@ -151,9 +172,10 @@ export default function Services() {
           is_active: currentService.is_active !== undefined ? currentService.is_active : true,
         }]);
 
-      if (!error) {
-        setIsEditing(false);
-        fetchServices();
+      if (error) {
+        fetchServices(false); // revert
+      } else {
+        fetchServices(false);
       }
     }
   };
@@ -168,13 +190,16 @@ export default function Services() {
   };
 
   const toggleActive = async (service: Service) => {
+    // Optimistic UI updates
+    setServices(prev => prev.map(s => s.id === service.id ? { ...s, is_active: !s.is_active } : s));
+
     const { error } = await supabase
       .from("services")
       .update({ is_active: !service.is_active })
       .eq("id", service.id);
     
-    if (!error) {
-      fetchServices();
+    if (error) {
+      fetchServices(false); // revert silently
     }
   };
 

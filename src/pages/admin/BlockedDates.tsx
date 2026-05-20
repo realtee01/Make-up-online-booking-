@@ -14,8 +14,8 @@ export default function BlockedDates() {
     fetchBlockedDates();
   }, []);
 
-  async function fetchBlockedDates() {
-    setLoading(true);
+  async function fetchBlockedDates(showLoader = true) {
+    if (showLoader) setLoading(true);
     const { data, error } = await supabase
       .from("blocked_dates")
       .select("*")
@@ -25,7 +25,7 @@ export default function BlockedDates() {
     if (!error && data) {
       setBlockedDates(data);
     }
-    setLoading(false);
+    if (showLoader) setLoading(false);
   }
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -39,18 +39,22 @@ export default function BlockedDates() {
     if (!error) {
       setNewDate("");
       setNewReason("");
-      fetchBlockedDates();
+      fetchBlockedDates(false);
     }
   };
 
   const handleRemove = async (id: string) => {
+    // Optimistic update for snappy UI
+    setBlockedDates(prev => prev.filter(b => b.id !== id));
+
     const { error } = await supabase
       .from("blocked_dates")
       .delete()
       .eq("id", id);
 
-    if (!error) {
-      fetchBlockedDates();
+    if (error) {
+      // Revert on failure
+      fetchBlockedDates(false);
     }
   };
 
