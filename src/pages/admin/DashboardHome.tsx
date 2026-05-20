@@ -158,8 +158,8 @@ export default function DashboardHome() {
         // Booking Activity (Peak Hours)
         const hourMap = new Map();
         appointments.forEach(a => {
-           if (a.appointment_time) {
-               const [h, m] = a.appointment_time.split(':');
+           if (a.start_time) {
+               const [h, m] = a.start_time.split(':');
                const hrInt = parseInt(h);
                const suffix = hrInt >= 12 ? 'PM' : 'AM';
                const hr12 = hrInt % 12 || 12;

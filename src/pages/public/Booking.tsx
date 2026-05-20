@@ -121,7 +121,7 @@ export default function Booking() {
     // 2. Get business hours for this weekday
     const weekday = selectedDate.getDay();
     const dayHours = businessHours.find(h => h.weekday === weekday);
-    if (!dayHours || !dayHours.is_open) return [];
+    if (!dayHours || !dayHours.is_open || !dayHours.start_time || !dayHours.end_time) return [];
 
     // Generate slots
     const slots: { start: Date, end: Date, label: string }[] = [];
@@ -152,6 +152,7 @@ export default function Booking() {
       // Check overlap with appointments
       const hasOverlap = existingAppointments.some(app => {
         if (!isSameDay(new Date(app.appointment_date), selectedDate)) return false;
+        if (!app.start_time || !app.end_time) return false;
         
         const appStart = new Date(selectedDate);
         const [aStartH, aStartM] = app.start_time.split(':').map(Number);
@@ -569,7 +570,7 @@ export default function Booking() {
                 
                 <h2 className="font-serif text-4xl sm:text-5xl text-brand-900 mb-6 font-light">See you soon.</h2>
                 <p className="text-brand-800/60 leading-relaxed font-light mb-12">
-                  Thank you, {form.name.split(' ')[0]}. Your session request has been received. You will receive an email confirmation shortly containing details about your appointment and preparation steps.
+                  Thank you, {(form.name || '').split(' ')[0]}. Your session request has been received. You will receive an email confirmation shortly containing details about your appointment and preparation steps.
                 </p>
 
                 <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-brand-900/5 text-left mb-12 inline-block w-full">
