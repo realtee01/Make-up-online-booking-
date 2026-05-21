@@ -78,7 +78,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center pt-8 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10 w-full">
-          <div className="animate-in fade-in slide-in-from-left-8 duration-1000 ease-out">
+          <div className="animate-fade-in-left">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-brand-200 mb-8 shadow-sm">
               <span className="w-1.5 h-1.5 bg-brand-300 rounded-full animate-pulse"></span>
               <span className="text-[11px] tracking-[0.2em] font-bold uppercase text-brand-800/60">Now Booking · Spring Season</span>
@@ -123,10 +123,10 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="relative animate-in fade-in slide-in-from-right-12 duration-1000 ease-out delay-200">
+          <div className="relative animate-fade-in-right">
             <div className="aspect-[10/12] rounded-[4rem] overflow-hidden shadow-2xl shadow-brand-900/10 bg-brand-100">
               <img 
-                src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?fm=webp&q=70&w=1000&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?fm=webp&q=50&w=650&auto=format&fit=crop" 
                 alt="Refined Makeup Artistry" 
                 className="w-full h-full object-cover"
                 fetchPriority="high"
@@ -179,7 +179,7 @@ export default function Home() {
                 <div key={service.id} className="group cursor-pointer">
                   <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden mb-8 shadow-sm transition-all duration-500 group-hover:shadow-xl group-hover:shadow-brand-900/5 group-hover:-translate-y-1">
                     <img 
-                      src={service.image_url ? `${service.image_url}${service.image_url.includes('?') ? '&' : '?'}fm=webp&q=70&w=600` : `https://images.unsplash.com/photo-${[
+                      src={service.image_url ? `${service.image_url}${service.image_url.includes('?') ? '&' : '?'}fm=webp&q=50&w=400` : `https://images.unsplash.com/photo-${[
                         '1522337660859-02fbefca4702',
                         '1594465919760-441fe5908ab0',
                         '1596462502278-27bfdc403348',
@@ -188,7 +188,7 @@ export default function Home() {
                         '1596704017254-9b121068fb31',
                         '1580870059885-a4b5d63428df',
                         '1487412720507-e7ab37603c6f'
-                      ][idx % 8]}?fm=webp&q=70&w=600&auto=format&fit=crop`}
+                      ][idx % 8]}?fm=webp&q=50&w=400&auto=format&fit=crop`}
                       alt={service.name}
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                       loading="lazy"
@@ -230,7 +230,7 @@ export default function Home() {
             <div className="lg:col-span-5 relative">
               <div className="aspect-[4/5] rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl shadow-brand-900/10">
                 <img 
-                  src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?fm=webp&q=70&w=800&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?fm=webp&q=50&w=500&auto=format&fit=crop" 
                   alt="Sophie Laurent - Artist & Founder" 
                   className="w-full h-full object-cover"
                   loading="lazy"
@@ -310,7 +310,7 @@ export default function Home() {
               {/* Dynamic Content Panels with subtle transitions and screen reader live state support */}
               <div id="about-tab-panel" role="tabpanel" aria-labelledby={`tab-${aboutTab}`} className="min-h-[340px]">
                 {aboutTab === "artist" && (
-                  <div className="space-y-6 text-brand-800/70 leading-relaxed font-light text-base md:text-lg animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="space-y-6 text-brand-800/70 leading-relaxed font-light text-base md:text-lg animate-fade-in-up">
                     <p>
                       Sophie Laurent is an internationally acclaimed master makeup artist with over 12 years of hands-on expertise traveling across Paris, Stockholm, and private islands. Raised in Stockholm and educated in elite Parisian studio art institutions, Sophie has developed an architectural approach to beauty.
                     </p>
@@ -325,7 +325,7 @@ export default function Home() {
                 )}
 
                 {aboutTab === "records" && (
-                  <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="space-y-4 sm:space-y-6 animate-fade-in-up">
                     <p className="text-brand-800/60 leading-relaxed font-light text-base md:text-lg">
                       Our past records showcase a legacy of outstanding reliability, flawless timeline coordination, and professional acclaim.
                     </p>
@@ -384,7 +384,7 @@ export default function Home() {
                 )}
 
                 {aboutTab === "press" && (
-                  <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="space-y-4 sm:space-y-6 animate-fade-in-up">
                     <p className="text-brand-800/60 leading-relaxed font-light text-base md:text-lg">
                       Maison Lumière has been featured in top physical and digital print publications. See what leading critics and luxury advisors write about our signature styles:
                     </p>

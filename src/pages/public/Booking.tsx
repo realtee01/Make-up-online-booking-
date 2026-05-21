@@ -287,7 +287,7 @@ export default function Booking() {
         )}
 
         {step === 1 && (
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 max-w-5xl mx-auto">
+          <div className="animate-fade-in-up max-w-5xl mx-auto">
             <h2 className="font-serif text-3xl text-brand-900 mb-10 font-light">Choose a service</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {services.map((service, idx) => (
@@ -302,7 +302,7 @@ export default function Booking() {
                 >
                   <div className="w-full sm:w-20 h-32 sm:h-20 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm flex-shrink-0">
                     <img 
-                      src={service.image_url ? `${service.image_url}${service.image_url.includes('?') ? '&' : '?'}fm=webp&q=70&w=300` : `https://images.unsplash.com/photo-${[
+                      src={service.image_url ? `${service.image_url}${service.image_url.includes('?') ? '&' : '?'}fm=webp&q=50&w=240` : `https://images.unsplash.com/photo-${[
                         '1522337660859-02fbefca4702',
                         '1594465919760-441fe5908ab0',
                         '1596462502278-27bfdc403348',
@@ -311,7 +311,7 @@ export default function Booking() {
                         '1596704017254-9b121068fb31',
                         '1580870059885-a4b5d63428df',
                         '1487412720507-e7ab37603c6f'
-                      ][idx % 8]}?fm=webp&q=70&w=300&auto=format&fit=crop`}
+                      ][idx % 8]}?fm=webp&q=50&w=240&auto=format&fit=crop`}
                       alt={service.name}
                       className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700"
                       loading="lazy"
@@ -347,7 +347,7 @@ export default function Booking() {
         )}
 
         {step === 2 && (
-          <div className="animate-in fade-in slide-in-from-right-8 duration-700 max-w-5xl mx-auto">
+          <div className="animate-fade-in-right max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <h2 className="font-serif text-3xl text-brand-900 font-light">Select a date & time</h2>
               <button onClick={() => setStep(1)} className="text-[11px] font-bold uppercase tracking-[0.15em] text-brand-800/40 hover:text-brand-900 transition-colors flex items-center gap-2">
@@ -399,11 +399,11 @@ export default function Booking() {
                     Select a date to see available times
                   </div>
                 ) : availableSlots.length === 0 ? (
-                  <div className="animate-in fade-in zoom-in-95 duration-500 py-20 bg-brand-100/50 rounded-[3rem] text-center">
+                  <div className="animate-fade-in-up py-20 bg-brand-100/50 rounded-[3rem] text-center">
                     <p className="text-brand-800/40 italic">No availability on this date</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 animate-fade-in-up">
                     {availableSlots.map((slot, i) => {
                       const isSelected = selectedTimeSlot?.start.getTime() === slot.start.getTime();
                       return (
@@ -439,7 +439,7 @@ export default function Booking() {
         )}
 
         {step === 3 && (
-          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+          <div className="animate-fade-in-right">
             <button onClick={() => setStep(2)} className="flex items-center gap-2 text-sm uppercase tracking-widest text-slate-500 hover:text-brand-900 mb-8 transition-colors">
               <ArrowLeft className="w-4 h-4" /> Back to Details
             </button>
@@ -546,7 +546,7 @@ export default function Booking() {
         )}
 
         {step === 4 && (
-          <div className="animate-in zoom-in-95 duration-500 max-w-lg mx-auto text-center py-20">
+          <div className="animate-fade-in-up max-w-lg mx-auto text-center py-20">
             {isCancelled ? (
               <>
                 <div className="w-24 h-24 bg-brand-50 text-brand-900 shadow-xl shadow-brand-900/5 rounded-full flex items-center justify-center mx-auto mb-8">
