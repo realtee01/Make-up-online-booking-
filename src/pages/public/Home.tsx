@@ -126,12 +126,10 @@ export default function Home() {
           <div className="relative animate-fade-in-right">
             <div className="aspect-[10/12] rounded-[4rem] overflow-hidden shadow-2xl shadow-brand-900/10 bg-brand-100">
               <img 
-                src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?fm=webp&q=50&w=650&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=1200&auto=format&fit=crop" 
                 alt="Refined Makeup Artistry" 
                 className="w-full h-full object-cover"
                 fetchPriority="high"
-                width={500}
-                height={600}
               />
             </div>
             {/* Absolute Floating Badge on Image */}
@@ -179,7 +177,7 @@ export default function Home() {
                 <div key={service.id} className="group cursor-pointer">
                   <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden mb-8 shadow-sm transition-all duration-500 group-hover:shadow-xl group-hover:shadow-brand-900/5 group-hover:-translate-y-1">
                     <img 
-                      src={service.image_url ? `${service.image_url}${service.image_url.includes('?') ? '&' : '?'}fm=webp&q=50&w=400` : `https://images.unsplash.com/photo-${[
+                      src={service.image_url ? `${service.image_url}${service.image_url.includes('?') ? '&' : '?'}q=80&w=800` : `https://images.unsplash.com/photo-${[
                         '1522337660859-02fbefca4702',
                         '1594465919760-441fe5908ab0',
                         '1596462502278-27bfdc403348',
@@ -188,12 +186,10 @@ export default function Home() {
                         '1596704017254-9b121068fb31',
                         '1580870059885-a4b5d63428df',
                         '1487412720507-e7ab37603c6f'
-                      ][idx % 8]}?fm=webp&q=50&w=400&auto=format&fit=crop`}
+                      ][idx % 8]}?q=80&w=800&auto=format&fit=crop`}
                       alt={service.name}
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                       loading="lazy"
-                      width={400}
-                      height={500}
                     />
                     <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-sm">
                       <span className="text-[13px] font-bold text-brand-900 tracking-wider">${service.price}</span>
@@ -226,21 +222,29 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-24 items-start">
             
-            {/* Left: Portait & Quick Stats */}
-            <div className="lg:col-span-5 relative">
+            {/* Left: Portrait, overlay close-up photo & Quick Stats */}
+            <div className="lg:col-span-5 relative mb-12 lg:mb-0">
               <div className="aspect-[4/5] rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl shadow-brand-900/10">
                 <img 
-                  src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?fm=webp&q=50&w=500&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200&auto=format&fit=crop" 
                   alt="Sophie Laurent - Artist & Founder" 
                   className="w-full h-full object-cover"
                   loading="lazy"
-                  width={400}
-                  height={500}
+                />
+              </div>
+              
+              {/* Secondary Overlapping Closeup Makeup Photo */}
+              <div className="absolute -bottom-10 -left-10 w-44 sm:w-56 aspect-[4/5] rounded-[2rem] overflow-hidden border-[10px] border-white shadow-2xl hidden md:block z-20 transition-transform duration-500 hover:scale-[1.05]">
+                <img 
+                  src="https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=800&auto=format&fit=crop" 
+                  alt="Close-up makeup detail of editorial portrait shot" 
+                  className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
               
               {/* Overlay Signature Badge - Relative on mobile, turns absolute on desktop */}
-              <div className="relative lg:absolute mt-6 lg:mt-0 right-0 bottom-0 lg:-bottom-8 lg:-right-8 bg-brand-900 text-brand-50 p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl max-w-full sm:max-w-xs mx-auto lg:mx-0">
+              <div className="relative lg:absolute mt-6 lg:mt-0 right-0 bottom-0 lg:-bottom-8 lg:-right-8 bg-brand-900 text-brand-50 p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl max-w-full sm:max-w-xs mx-auto lg:mx-0 z-10 transition-transform hover:scale-[1.02] duration-300">
                 <p className="font-serif text-xl italic text-brand-200 mb-1">Sophie Laurent</p>
                 <p className="text-[10px] tracking-[0.2em] uppercase font-bold text-brand-200/60 mb-4">Founder / Lead Director</p>
                 <p className="text-xs text-brand-50/70 font-light leading-relaxed">
