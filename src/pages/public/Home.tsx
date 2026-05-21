@@ -109,26 +109,29 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-8 sm:gap-12 justify-center sm:justify-start">
               <div className="flex flex-col">
                 <span className="text-2xl font-serif text-brand-900 leading-none mb-1">12+</span>
-                <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-brand-800/40">Years<br/>Artistry</span>
+                <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-brand-900/60">Years<br/>Artistry</span>
               </div>
-              <div className="w-px h-10 bg-brand-200"></div>
+              <div className="w-px h-10 bg-brand-200" aria-hidden="true"></div>
               <div className="flex flex-col">
                 <span className="text-2xl font-serif text-brand-900 leading-none mb-1">400+</span>
-                <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-brand-800/40">Brides<br/>Prepared</span>
+                <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-brand-900/60">Brides<br/>Prepared</span>
               </div>
-              <div className="w-px h-10 bg-brand-200"></div>
-              <div className="flex gap-1 text-amber-500/60">
-                {[1, 2, 3, 4, 5].map(s => <span key={s} className="text-lg">★</span>)}
+              <div className="w-px h-10 bg-brand-200" aria-hidden="true"></div>
+              <div className="flex gap-1 text-amber-600" aria-label="5 out of 5 stars review rating">
+                {[1, 2, 3, 4, 5].map(s => <span key={s} className="text-lg" aria-hidden="true">★</span>)}
               </div>
             </div>
           </div>
           
           <div className="relative animate-in fade-in slide-in-from-right-12 duration-1000 ease-out delay-200">
-            <div className="aspect-[10/12] rounded-[4rem] overflow-hidden shadow-2xl shadow-brand-900/10">
+            <div className="aspect-[10/12] rounded-[4rem] overflow-hidden shadow-2xl shadow-brand-900/10 bg-brand-100">
               <img 
-                src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=2669&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?fm=webp&q=70&w=1000&auto=format&fit=crop" 
                 alt="Refined Makeup Artistry" 
                 className="w-full h-full object-cover"
+                fetchPriority="high"
+                width={500}
+                height={600}
               />
             </div>
             {/* Absolute Floating Badge on Image */}
@@ -176,7 +179,7 @@ export default function Home() {
                 <div key={service.id} className="group cursor-pointer">
                   <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden mb-8 shadow-sm transition-all duration-500 group-hover:shadow-xl group-hover:shadow-brand-900/5 group-hover:-translate-y-1">
                     <img 
-                      src={service.image_url || `https://images.unsplash.com/photo-${[
+                      src={service.image_url ? `${service.image_url}${service.image_url.includes('?') ? '&' : '?'}fm=webp&q=70&w=600` : `https://images.unsplash.com/photo-${[
                         '1522337660859-02fbefca4702',
                         '1594465919760-441fe5908ab0',
                         '1596462502278-27bfdc403348',
@@ -185,9 +188,12 @@ export default function Home() {
                         '1596704017254-9b121068fb31',
                         '1580870059885-a4b5d63428df',
                         '1487412720507-e7ab37603c6f'
-                      ][idx % 8]}?q=80&w=1200&auto=format&fit=crop`}
+                      ][idx % 8]}?fm=webp&q=70&w=600&auto=format&fit=crop`}
                       alt={service.name}
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                      loading="lazy"
+                      width={400}
+                      height={500}
                     />
                     <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-sm">
                       <span className="text-[13px] font-bold text-brand-900 tracking-wider">${service.price}</span>
@@ -224,9 +230,12 @@ export default function Home() {
             <div className="lg:col-span-5 relative">
               <div className="aspect-[4/5] rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl shadow-brand-900/10">
                 <img 
-                  src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?fm=webp&q=70&w=800&auto=format&fit=crop" 
                   alt="Sophie Laurent - Artist & Founder" 
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  width={400}
+                  height={500}
                 />
               </div>
               
@@ -242,48 +251,64 @@ export default function Home() {
             
             {/* Right: Rich Interactive Records & Profile Content */}
             <div className="lg:col-span-7 pt-4">
-              <span className="text-[11px] tracking-[0.3em] uppercase font-bold text-brand-800/40 mb-4 block">The Director & Legacy</span>
+              <span className="text-[11px] tracking-[0.3em] uppercase font-bold text-brand-900/60 mb-4 block">The Director & Legacy</span>
               <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-brand-900 mb-8 leading-tight font-light">
                 Meet the founder & <br/>
-                <span className="italic text-brand-800/40">past records</span>.
+                <span className="italic text-brand-900/50">past records</span>.
               </h2>
               
-              {/* Tab Navigation Controls */}
-              <div className="flex border-b border-brand-200 mb-8 overflow-x-auto gap-2 sm:gap-4 no-scrollbar pb-0.5 scroll-smooth snap-x">
+              {/* Tab Navigation Controls with full ARIA landmarks and roles */}
+              <div 
+                className="flex border-b border-brand-200 mb-8 overflow-x-auto gap-2 sm:gap-4 no-scrollbar pb-0.5 scroll-smooth snap-x"
+                role="tablist"
+                aria-label="Founder professional background tabs"
+              >
                 <button 
+                  id="tab-artist"
+                  role="tab"
+                  aria-selected={aboutTab === "artist"}
+                  aria-controls="about-tab-panel"
                   onClick={() => setAboutTab("artist")}
-                  className={`pb-4 px-2 text-[11px] sm:text-[12px] uppercase tracking-[0.15em] font-bold transition-all relative border-b-2 whitespace-nowrap snap-start ${
+                  className={`pb-4 px-2 text-[11px] sm:text-[12px] uppercase tracking-[0.15em] font-bold transition-all relative border-b-2 whitespace-nowrap snap-start focus:outline-none focus:ring-2 focus:ring-brand-900 rounded-sm ${
                     aboutTab === "artist" 
                       ? "text-brand-900 border-brand-900" 
-                      : "text-brand-800/40 border-transparent hover:text-brand-900"
+                      : "text-brand-900/60 border-transparent hover:text-brand-900"
                   }`}
                 >
                   The Artist
                 </button>
                 <button 
+                  id="tab-records"
+                  role="tab"
+                  aria-selected={aboutTab === "records"}
+                  aria-controls="about-tab-panel"
                   onClick={() => setAboutTab("records")}
-                  className={`pb-4 px-2 text-[11px] sm:text-[12px] uppercase tracking-[0.15em] font-bold transition-all relative border-b-2 whitespace-nowrap snap-start ${
+                  className={`pb-4 px-2 text-[11px] sm:text-[12px] uppercase tracking-[0.15em] font-bold transition-all relative border-b-2 whitespace-nowrap snap-start focus:outline-none focus:ring-2 focus:ring-brand-900 rounded-sm ${
                     aboutTab === "records" 
                       ? "text-brand-900 border-brand-900" 
-                      : "text-brand-800/40 border-transparent hover:text-brand-900"
+                      : "text-brand-900/60 border-transparent hover:text-brand-900"
                   }`}
                 >
                   Historical Records
                 </button>
                 <button 
+                  id="tab-press"
+                  role="tab"
+                  aria-selected={aboutTab === "press"}
+                  aria-controls="about-tab-panel"
                   onClick={() => setAboutTab("press")}
-                  className={`pb-4 px-2 text-[11px] sm:text-[12px] uppercase tracking-[0.15em] font-bold transition-all relative border-b-2 whitespace-nowrap snap-start ${
+                  className={`pb-4 px-2 text-[11px] sm:text-[12px] uppercase tracking-[0.15em] font-bold transition-all relative border-b-2 whitespace-nowrap snap-start focus:outline-none focus:ring-2 focus:ring-brand-900 rounded-sm ${
                     aboutTab === "press" 
                       ? "text-brand-900 border-brand-900" 
-                      : "text-brand-800/40 border-transparent hover:text-brand-900"
+                      : "text-brand-900/60 border-transparent hover:text-brand-900"
                   }`}
                 >
                   Press & Honors
                 </button>
               </div>
 
-              {/* Dynamic Content Panels with subtle transitions */}
-              <div className="min-h-[340px]">
+              {/* Dynamic Content Panels with subtle transitions and screen reader live state support */}
+              <div id="about-tab-panel" role="tabpanel" aria-labelledby={`tab-${aboutTab}`} className="min-h-[340px]">
                 {aboutTab === "artist" && (
                   <div className="space-y-6 text-brand-800/70 leading-relaxed font-light text-base md:text-lg animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <p>

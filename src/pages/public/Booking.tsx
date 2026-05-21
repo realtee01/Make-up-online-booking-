@@ -302,7 +302,7 @@ export default function Booking() {
                 >
                   <div className="w-full sm:w-20 h-32 sm:h-20 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm flex-shrink-0">
                     <img 
-                      src={service.image_url || `https://images.unsplash.com/photo-${[
+                      src={service.image_url ? `${service.image_url}${service.image_url.includes('?') ? '&' : '?'}fm=webp&q=70&w=300` : `https://images.unsplash.com/photo-${[
                         '1522337660859-02fbefca4702',
                         '1594465919760-441fe5908ab0',
                         '1596462502278-27bfdc403348',
@@ -311,9 +311,12 @@ export default function Booking() {
                         '1596704017254-9b121068fb31',
                         '1580870059885-a4b5d63428df',
                         '1487412720507-e7ab37603c6f'
-                      ][idx % 8]}?q=80&w=400&auto=format&fit=crop`}
+                      ][idx % 8]}?fm=webp&q=70&w=300&auto=format&fit=crop`}
                       alt={service.name}
                       className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700"
+                      loading="lazy"
+                      width={120}
+                      height={120}
                     />
                   </div>
                   <div className="flex-1">

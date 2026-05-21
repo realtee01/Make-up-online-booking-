@@ -92,9 +92,12 @@ export default function Contact() {
           <div className="relative animate-in fade-in slide-in-from-right-12 duration-1000 delay-150">
             <div className="aspect-[3/4] rounded-[3rem] overflow-hidden shadow-2xl shadow-brand-900/10">
               <img 
-                src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?fm=webp&q=70&w=800&auto=format&fit=crop" 
                 alt="Studio space with makeup station" 
                 className="w-full h-full object-cover"
+                loading="lazy"
+                width={600}
+                height={800}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-900/60 to-transparent flex items-end p-8 sm:p-12">
                 <div className="bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-[2rem] shadow-xl w-full max-w-sm">
