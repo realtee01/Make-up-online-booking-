@@ -95,11 +95,18 @@ export default function AdminLayout() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4 animate-pulse text-slate-800">
-          <Sparkles className="w-8 h-8" />
-          <p className="uppercase tracking-widest text-sm font-medium">Verifying Access...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-brand-50">
+        <motion.div
+          initial={{ opacity: 0.5 }}
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          className="text-center flex flex-col items-center justify-center gap-6"
+        >
+          <Logo className="w-24 h-24 text-brand-900" />
+          <h1 className="font-serif text-3xl sm:text-4xl text-brand-900 tracking-tight font-light italic">
+            Loading Workspace
+          </h1>
+        </motion.div>
       </div>
     );
   }
