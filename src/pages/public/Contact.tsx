@@ -32,7 +32,7 @@ export default function Contact() {
       <div className="max-w-7xl mx-auto px-6 py-20 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
           
-          <div className="animate-fade-in-up">
+          <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
             <h1 className="font-serif text-5xl lg:text-7xl text-brand-900 mb-8 font-light tracking-tight">
               Get in <span className="italic text-brand-800/40">touch</span>
             </h1>
@@ -89,14 +89,13 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="relative animate-fade-in-right">
+          <div className="relative animate-in fade-in slide-in-from-right-12 duration-1000 delay-150">
             <div className="aspect-[3/4] rounded-[3rem] overflow-hidden shadow-2xl shadow-brand-900/10">
-               <img 
+              <img 
                 src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200&auto=format&fit=crop" 
-                 alt="Studio space with makeup station" 
-                 className="w-full h-full object-cover"
-                 loading="lazy"
-               />
+                alt="Studio space with makeup station" 
+                className="w-full h-full object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-900/60 to-transparent flex items-end p-8 sm:p-12">
                 <div className="bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-[2rem] shadow-xl w-full max-w-sm">
                   <div className="flex items-center gap-4 mb-4 text-brand-900">

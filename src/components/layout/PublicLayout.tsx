@@ -69,53 +69,48 @@ export default function PublicLayout() {
         className={`min-h-screen flex flex-col font-sans text-brand-900 selection:bg-brand-300 selection:text-brand-900 transition-colors duration-500 ${showPreloader ? 'h-screen overflow-hidden' : ''}`}
         style={{ opacity: isFullyLoading ? 0 : 1 }}
       >
-        <header className="sticky top-0 z-50 bg-brand-50/90 backdrop-blur-md border-b border-brand-100/50" role="banner">
+        <header className="sticky top-0 z-50 bg-brand-50/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group" aria-label={`${businessName} home`}>
+          <Link to="/" className="flex items-center gap-3 group">
             <Logo className="w-12 h-12 text-brand-900" />
             <span className="text-2xl font-serif tracking-[0.02em] font-light text-brand-900">
               {businessName}
             </span>
           </Link>
-          <nav className="hidden lg:flex gap-10 text-[13px] tracking-[0.1em] text-brand-900 uppercase font-bold" aria-label="Main navigation">
-            <Link to="/#services" className="hover:text-brand-800 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-900 rounded-sm">Services</Link>
-            <Link to="/#about" className="hover:text-brand-800 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-900 rounded-sm">About</Link>
-            <Link to="/book" className="hover:text-brand-800 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-900 rounded-sm">Booking</Link>
-            <Link to="/contact" className="hover:text-brand-800 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-900 rounded-sm">Contact</Link>
+          <nav className="hidden lg:flex gap-10 text-[13px] tracking-[0.1em] text-brand-800/80 uppercase font-medium ml-12">
+            <Link to="/#services" className="hover:text-brand-900 transition-colors">Services</Link>
+            <Link to="/about" className="hover:text-brand-900 transition-colors">About</Link>
+            <Link to="/book" className="hover:text-brand-900 transition-colors">Booking</Link>
+            <Link to="/contact" className="hover:text-brand-900 transition-colors">Contact</Link>
           </nav>
           <div className="flex items-center gap-8">
-            <span className="hidden xl:block text-[11px] tracking-[0.2em] uppercase font-bold text-brand-900/60" aria-hidden="true">Studio</span>
+            <span className="hidden xl:block text-[11px] tracking-[0.2em] uppercase font-bold text-brand-800/40">Studio</span>
             <Link 
               to="/book" 
-              className="hidden md:inline-flex px-8 py-3 bg-brand-900 text-brand-50 uppercase tracking-[0.15em] text-[11px] font-bold hover:bg-brand-800 transition-all rounded-full shadow-lg shadow-brand-900/10 focus:outline-none focus:ring-2 focus:ring-brand-900"
-              aria-label="Book an appointment slot"
+              className="hidden md:inline-flex px-8 py-3 bg-brand-900 text-brand-50 uppercase tracking-[0.15em] text-[11px] font-bold hover:bg-brand-800 transition-all rounded-full shadow-lg shadow-brand-900/10"
             >
               Book Session
             </Link>
             <button 
-              className="lg:hidden p-2 -mr-2 text-brand-900 focus:outline-none focus:ring-2 focus:ring-brand-900 rounded-lg" 
+              className="lg:hidden p-2 -mr-2 text-brand-900" 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-expanded={isMobileMenuOpen}
-              aria-label={isMobileMenuOpen ? "Close main menu" : "Open main menu"}
-              aria-controls="mobile-navigation"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div id="mobile-navigation" className="lg:hidden absolute top-full left-0 right-0 bg-brand-50/95 backdrop-blur-md border-t border-brand-200/50 shadow-xl shadow-brand-900/5 p-6 flex flex-col gap-6" aria-label="Mobile navigation">
-            <Link to="/#services" className="text-[13px] tracking-[0.1em] text-brand-900 uppercase font-bold hover:text-brand-800 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Services</Link>
-            <Link to="/#about" className="text-[13px] tracking-[0.1em] text-brand-900 uppercase font-bold hover:text-brand-800 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
-            <Link to="/book" className="text-[13px] tracking-[0.1em] text-brand-900 uppercase font-bold hover:text-brand-800 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Booking</Link>
-            <Link to="/contact" className="text-[13px] tracking-[0.1em] text-brand-900 uppercase font-bold hover:text-brand-800 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-brand-50/95 backdrop-blur-md border-t border-brand-200/50 shadow-xl shadow-brand-900/5 p-6 flex flex-col gap-6">
+            <Link to="/#services" className="text-[13px] tracking-[0.1em] text-brand-800/80 uppercase font-medium hover:text-brand-900 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Services</Link>
+            <Link to="/about" className="text-[13px] tracking-[0.1em] text-brand-800/80 uppercase font-medium hover:text-brand-900 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+            <Link to="/book" className="text-[13px] tracking-[0.1em] text-brand-800/80 uppercase font-medium hover:text-brand-900 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Booking</Link>
+            <Link to="/contact" className="text-[13px] tracking-[0.1em] text-brand-800/80 uppercase font-medium hover:text-brand-900 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
             <Link 
               to="/book" 
               className="inline-flex justify-center px-8 py-4 mt-4 bg-brand-900 text-brand-50 uppercase tracking-[0.15em] text-[11px] font-bold hover:bg-brand-800 transition-all rounded-full"
               onClick={() => setIsMobileMenuOpen(false)}
-              aria-label="Book a session slot"
             >
               Book Session
             </Link>
