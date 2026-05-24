@@ -1,8 +1,8 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "../../lib/supabase";
 import { 
   Calendar, Users, Briefcase, Activity, 
-  TrendingUp, TrendingDown, DollarSign, Clock, CheckCircle2, UserPlus, AlertCircle, Sparkles
+  TrendingUp, TrendingDown, DollarSign, Clock, CheckCircle2, UserPlus, AlertCircle, Sparkles, RefreshCw
 } from "lucide-react";
 import { 
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -17,32 +17,33 @@ export default function DashboardHome() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
-      try {
-        // Parallel data fetching with Promise.all
-        const [appointmentsRes] = await Promise.all([
-          supabase
-            .from("appointments")
-            .select(`
-              *,
-              services:service_id (name, price)
-            `)
-            .order('created_at', { ascending: false })
-        ]);
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // Parallel data fetching with Promise.all
+      const [appointmentsRes] = await Promise.all([
+        supabase
+          .from("appointments")
+          .select(`
+            *,
+            services:service_id (name, price)
+          `)
+          .order('created_at', { ascending: false })
+      ]);
 
-        if (appointmentsRes.data) {
-          setAppointments(appointmentsRes.data);
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setIsLoading(false);
+      if (appointmentsRes.data) {
+        setAppointments(appointmentsRes.data);
       }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setIsLoading(false);
     }
-    fetchData();
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const analytics = useMemo(() => {
     let totalRev = 0;
@@ -178,8 +179,22 @@ export default function DashboardHome() {
           <h1 className={`font-serif text-3xl font-semibold tracking-tight ${headingColor}`}>Overview</h1>
           <p className={`mt-1 text-sm ${textColor}`}>Your business performance at a glance.</p>
         </div>
-        <div className={`text-xs px-3 py-1.5 rounded-full border font-medium ${theme === 'dark' ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-slate-200 text-slate-600'}`}>
-          Last 30 Days
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={fetchData}
+            disabled={isLoading}
+            className={`flex items-center gap-2 text-xs px-4 py-1.5 rounded-full border font-medium transition-colors ${
+              theme === 'dark' 
+                ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300 disabled:opacity-50' 
+                : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600 disabled:opacity-50'
+            }`}
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </button>
+          <div className={`text-xs px-3 py-1.5 rounded-full border font-medium ${theme === 'dark' ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-slate-200 text-slate-600'}`}>
+            Last 30 Days
+          </div>
         </div>
       </div>
 
@@ -209,10 +224,27 @@ export default function DashboardHome() {
       </motion.div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <motion.div 
+        variants={{
+          hidden: { opacity: 0 },
+          show: {
+            opacity: 1,
+            transition: {
+              staggerChildren: 0.1,
+              delayChildren: 0.1
+            }
+          }
+        }}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
+      >
         {statCards.map((stat, idx) => (
           <motion.div 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + idx * 0.05 }}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              show: { opacity: 1, y: 0 }
+            }}
             key={idx} 
             className={`${cardBg} p-6 rounded-[20px] border ${borderColor} shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group`}
           >
@@ -237,7 +269,7 @@ export default function DashboardHome() {
             <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-slate-100 dark:bg-slate-700 rounded-full blur-2xl opacity-0 group-hover:opacity-50 transition-opacity"></div>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
