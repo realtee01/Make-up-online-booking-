@@ -1,4 +1,4 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { BusinessSettings } from "../../types";
@@ -13,8 +13,21 @@ export default function PublicLayout() {
   const [isChildLoading, setIsChildLoading] = useState(true);
   const [showPreloader, setShowPreloader] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [heroTheme, setHeroTheme] = useState<'light' | 'dark'>('light');
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const location = useLocation();
+  const isHome = location.pathname === "/";
 
   const isFullyLoading = isLoading || isChildLoading;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -53,6 +66,9 @@ export default function PublicLayout() {
   // If we return completely here, Preloader doesn't get the updated business name until it's loaded. 
   // It's better to render Preloader as an overlay so the rest of the app can load in the background.
 
+  const headerTextColor = (isHome && heroTheme === 'dark' && !isScrolled) ? 'text-white' : 'text-[#381A0F]';
+  const headerButtonColor = (isHome && heroTheme === 'dark' && !isScrolled) ? 'bg-white text-black hover:bg-brand-100' : 'bg-[#1C1A19] text-white hover:bg-[#381A0F]';
+
   return (
     <>
       {showPreloader && (
@@ -69,30 +85,29 @@ export default function PublicLayout() {
         className={`min-h-screen flex flex-col font-sans text-brand-900 selection:bg-brand-300 selection:text-brand-900 transition-colors duration-500 ${showPreloader ? 'h-screen overflow-hidden' : ''}`}
         style={{ opacity: isFullyLoading ? 0 : 1 }}
       >
-        <header className="sticky top-0 z-50 bg-brand-50/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <Logo className="w-12 h-12 text-brand-900" />
-            <span className="text-2xl font-serif tracking-[0.02em] font-light text-brand-900">
+        <header className={`${isHome ? `fixed top-0 left-0 right-0 transition-all duration-500 ${isScrolled ? 'bg-brand-50/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}` : 'sticky top-0 bg-brand-50/80 backdrop-blur-md'} z-50`}>
+        <div className="w-full px-6 lg:px-12 xl:px-16 h-28 flex items-center justify-between mx-auto max-w-[1600px]">
+          <Link to="/" className="flex items-center gap-3 group w-56">
+            <Logo className={`w-10 h-10 ${headerTextColor} transition-colors duration-1000`} />
+            <span className={`text-2xl font-serif tracking-tight font-medium ${headerTextColor} transition-colors duration-1000`}>
               {businessName}
             </span>
           </Link>
-          <nav className="hidden lg:flex gap-10 text-[13px] tracking-[0.1em] text-brand-800/80 uppercase font-medium ml-12">
-            <Link to="/#services" className="hover:text-brand-900 transition-colors">Services</Link>
-            <Link to="/about" className="hover:text-brand-900 transition-colors">About</Link>
-            <Link to="/book" className="hover:text-brand-900 transition-colors">Booking</Link>
-            <Link to="/contact" className="hover:text-brand-900 transition-colors">Contact</Link>
+          <nav className={`hidden lg:flex flex-1 justify-center gap-8 xl:gap-12 text-[11px] tracking-[0.1em] font-bold uppercase ${headerTextColor} transition-colors duration-1000`}>
+            <Link to="/#services" className="hover:opacity-60 transition-opacity">Services</Link>
+            <Link to="/about" className="hover:opacity-60 transition-opacity">About</Link>
+            <Link to="/book" className="hover:opacity-60 transition-opacity">Booking</Link>
+            <Link to="/contact" className="hover:opacity-60 transition-opacity">Contact</Link>
           </nav>
-          <div className="flex items-center gap-8">
-            <span className="hidden xl:block text-[11px] tracking-[0.2em] uppercase font-bold text-brand-800/40">Studio</span>
+          <div className="flex items-center justify-end gap-6 w-56">
             <Link 
               to="/book" 
-              className="hidden md:inline-flex px-8 py-3 bg-brand-900 text-brand-50 uppercase tracking-[0.15em] text-[11px] font-bold hover:bg-brand-800 transition-all rounded-full shadow-lg shadow-brand-900/10"
+              className={`hidden md:inline-flex px-8 py-3.5 ${headerButtonColor} uppercase tracking-[0.15em] text-[10px] font-bold transition-all rounded-full shadow-md`}
             >
               Book Session
             </Link>
             <button 
-              className="lg:hidden p-2 -mr-2 text-brand-900" 
+              className={`lg:hidden p-2 -mr-2 ${headerTextColor} transition-colors duration-1000`} 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -119,7 +134,7 @@ export default function PublicLayout() {
       </header>
 
       <main className="flex-grow">
-        <Outlet context={{ businessName, businessDescription, setIsChildLoading }} />
+        <Outlet context={{ businessName, businessDescription, setIsChildLoading, heroTheme, setHeroTheme }} />
       </main>
 
       <footer className="bg-brand-100 py-24 border-t border-brand-200 text-brand-900">
