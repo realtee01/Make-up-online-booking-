@@ -132,14 +132,14 @@ export default function PublicLayout() {
                           } z-50`}
                         >
                           <div className="flex flex-col gap-1">
-                            <a 
-                              href="/#services" 
+                            <Link 
+                              to="/#services" 
                               className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-brand-peach/15 transition-colors text-xs uppercase tracking-widest font-semibold text-current"
                               onClick={() => setHoveredDropdown(null)}
                             >
                               <Sparkle className="w-3.5 h-3.5 text-brand-peach" />
                               Signature Services
-                            </a>
+                            </Link>
                             <Link 
                               to="/book" 
                               className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-brand-peach/15 transition-colors text-xs uppercase tracking-widest font-semibold text-current"
@@ -187,14 +187,14 @@ export default function PublicLayout() {
                               <User className="w-3.5 h-3.5 text-brand-peach" />
                               About Us
                             </Link>
-                            <a 
-                              href="/#about-studio" 
+                            <Link 
+                              to="/#about-studio" 
                               className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-brand-peach/15 transition-colors text-xs uppercase tracking-widest font-semibold text-current"
                               onClick={() => setHoveredDropdown(null)}
                             >
                               <Sparkle className="w-3.5 h-3.5 text-brand-peach" />
                               Our Philosophy
-                            </a>
+                            </Link>
                           </div>
                         </motion.div>
                       )}
@@ -202,12 +202,12 @@ export default function PublicLayout() {
                   </div>
 
                   {/* Journal */}
-                  <a 
-                    href="/#blog" 
+                  <Link 
+                    to="/#blog" 
                     className="px-5 py-2 text-[14px] font-secondary font-medium uppercase tracking-widest text-current/85 hover:text-brand-peach transition-colors"
                   >
                     Journal
-                  </a>
+                  </Link>
 
                   {/* Contact */}
                   <Link 
@@ -256,13 +256,13 @@ export default function PublicLayout() {
                 transition={{ duration: 0.3 }}
                 className="lg:hidden absolute top-full left-4 right-4 mt-2 bg-white/95 backdrop-blur-lg border border-[#080808]/5 shadow-2xl rounded-3xl p-6 flex flex-col gap-5 z-50 pointer-events-auto"
               >
-                <a 
-                  href="/#services" 
+                <Link 
+                  to="/#services" 
                   className="text-xs tracking-[0.2em] text-brand-900 uppercase font-bold hover:text-brand-peach transition-colors" 
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Services
-                </a>
+                </Link>
                 <Link 
                   to="/about" 
                   className="text-xs tracking-[0.2em] text-brand-900 uppercase font-bold hover:text-brand-peach transition-colors" 

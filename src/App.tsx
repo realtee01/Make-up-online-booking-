@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import PublicLayout from "./components/layout/PublicLayout";
 import Home from "./pages/public/Home";
 import Booking from "./pages/public/Booking";
@@ -18,9 +19,31 @@ import BusinessHours from "./pages/admin/BusinessHours";
 import BlockedDates from "./pages/admin/BlockedDates";
 import BusinessSettings from "./pages/admin/BusinessSettings";
 
+function ScrollToTopOrHash() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      // Small timeout to allow DOM to render before scrolling
+      setTimeout(() => {
+        const id = hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTopOrHash />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<PublicLayout />}>

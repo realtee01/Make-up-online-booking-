@@ -194,7 +194,7 @@ export default function Home() {
                   <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-1.5 transition-transform" />
                 </Link>
                 <nav className={`flex justify-center gap-8 text-[11px] tracking-[0.1em] font-bold uppercase border-b pb-1 transition-all cursor-pointer ${isLight ? 'text-[#381A0F] border-[#381A0F]/10 hover:border-[#381A0F]' : 'text-white border-white/10 hover:border-white'}`}>
-                  <a href="#services">View the menu</a>
+                  <Link to="/#services">View the menu</Link>
                 </nav>
               </div>
 
